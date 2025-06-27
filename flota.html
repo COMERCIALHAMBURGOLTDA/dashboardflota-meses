@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Seleccione Patente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background: #e9ecf8;
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            margin: 0; padding: 0;
+        }
+        .header {
+            background: #454cb3;
+            color: white;
+            padding: 24px 20px 14px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px 0 #0002;
+        }
+        .container {
+            max-width: none;
+            margin: 36px auto 0 auto;
+            padding: 0 32px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px 18px;
+            align-items: flex-start;
+        }
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 700px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 0 6px;
+            }
+        }
+        .card {
+            border-radius: 24px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 45, 61, 0.09);
+            padding: 28px 20px 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: box-shadow 0.22s, transform 0.16s, border-color 0.17s;
+            border: 2.5px solid transparent;
+            cursor: pointer;
+            position: relative;
+        }
+        .card.selected {
+            border-color: #3949ab !important;
+            box-shadow: 0 12px 44px 0 rgba(60,70,160,0.16), 0 0 0 4px #3949ab30;
+            transform: scale(1.025);
+            z-index: 2;
+        }
+        .card:hover {
+            box-shadow: 0 14px 48px 0 rgba(60,70,160,0.14);
+            transform: translateY(-2px) scale(1.013);
+        }
+        .card.green {
+            background: linear-gradient(100deg, #50de98 80%, #47b97a 100%);
+            color: white;
+            border-color: #47b97a22;
+        }
+        .card.yellow {
+            background: linear-gradient(100deg, #ffe499 80%, #ffcc54 100%);
+            color: #2a2412;
+            border-color: #ffd00026;
+        }
+        .card.red {
+            background: linear-gradient(100deg, #ff8581 90%, #ee6c63 100%);
+            color: white;
+            border-color: #ee6c6388;
+            animation: blink-card 1.4s ease-in-out infinite;
+        }
+        @keyframes blink-card {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        .patente {
+            font-size: 1.35rem;
+            font-weight: bold;
+            letter-spacing: 1.1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        .patente .icon {
+            font-size: 1.38em;
+            margin-right: 3px;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .status-icon {
+            margin-left: 12px;
+            font-size: 1.22em;
+            vertical-align: middle;
+            display: inline-flex;
+            align-items: center;
+            filter: drop-shadow(0 1px 1px #0001);
+        }
+        .km-restantes {
+            font-size: 1.08rem;
+            margin-left: 34px;
+            font-weight: 500;
+            display: flex; 
+            flex-direction: column;
+            gap: 4px;
+        }
+        .km-restantes > div,
+        .km-restantes .info-revision {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .km-restantes .icon {
+            font-size: 1.19em;
+            margin-right: 7px;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .km-restantes.green strong { color: #036e41; }
+        .km-restantes.yellow strong { color: #ba7e0e; }
+        .km-restantes.red strong { color: #fff; }
+        .footer-btn {
+            display: flex;
+            justify-content: center;
+            margin: 45px 0 0 0;
+        }
+        .btn {
+            background: #9fa8da;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.09rem;
+            padding: 14px 0;
+            width: 92%;
+            cursor: pointer;
+            transition: background .16s, box-shadow 0.2s;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 14px 0 #adb8fa22;
+        }
+        .btn:disabled {
+            background: #c3cae4;
+            color: #e8eaf6;
+            cursor: not-allowed;
+        }
+        .btn:active { background: #7986cb; }
+        .info-sheet {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 32px 0 #6871ee17;
+            padding: 30px 18px 24px 18px;
+            margin: 38px auto 0 auto;
+            max-width: 540px;
+            min-width: 0;
+            font-size: 1.04rem;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .section-title { font-size: 1.13em; color: #3949ab; font-weight: bold; letter-spacing: 0.6px; margin: 26px 0 8px 0;}
+        .section-table { width: 100%; border-collapse: collapse; margin-bottom: 9px;}
+        .section-table th, .section-table td { border: 1px solid #e0e3f4; padding: 6px 7px; font-size: 1em;}
+        .section-table th { background: #f6f7fd; text-align: left; }
+        .back-btn {
+            margin-top: 15px;
+            background: #fff;
+            color: #3949ab;
+            border: 1.5px solid #3949ab;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.03em;
+            transition: background 0.15s, color 0.15s;
+        }
+        .back-btn:hover {
+            background: #e9ecf8;
+            color: #1b1e5b;
+        }
+        .section-table td.critico { color: #d32f2f; font-weight: bold;}
+        .section-table td.atencion { color: #f9a825; font-weight: bold;}
+        .section-table td.ok { color: #388e3c; font-weight: bold;}
+        .tr-critico {
+            background: linear-gradient(105deg,#ffdad6 70%, #ffb9b5 100%);
+            animation: blink-bg 1.2s infinite;
+        }
+        @keyframes blink-bg {
+            0%, 100% { opacity: 1; }
+            40% { opacity: 0.55; }
+            80% { opacity: 1; }
+        }
+        .history-card {
+            border-radius: 14px;
+            background: #e5f8e8;
+            border: 2px solid #61ce79;
+            margin-bottom: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #4348b811;
+            display: flex;
+            align-items: center;
+            transition: box-shadow 0.18s, border-color 0.14s;
+        }
+        .history-card.green { border-color: #61ce79; background: #e5f8e8; }
+        .history-card.yellow { border-color: #ffd000; background: #fff7d1; }
+        .history-card.red { border-color: #ee6c63; background: linear-gradient(100deg, #ffdad6 90%, #ffb2ad 100%); animation: blink-card 1.2s infinite; }
+        .history-card:hover {
+            border-color: #3949ab;
+            box-shadow: 0 4px 20px #3949ab19;
+        }
+        .motivos-alerta {
+            color: #985a1b;
+            margin-top: 7px;
+            font-size: 1.01em;
+            font-weight: 500;
+            padding-left: 7px;
+        }
+        .motivos-alerta ul {
+            margin: 0.2em 0 0.2em 0.2em;
+            padding: 0 0 0 16px;
+        }
+        .motivos-alerta li {
+            margin-bottom: 2px;
+            font-size: 0.99em;
+        }
+        .estado-actual-panel {
+            background: #fff7d1;
+            border: 2.5px solid #ffd000;
+            border-radius: 18px;
+            margin: 10px 0 24px 0;
+            box-shadow: 0 4px 18px #ffd0001f;
+            padding: 16px 16px 10px 22px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            color: #ba7e0e;
+        }
+        .estado-actual-icon {
+            font-size: 2.5em;
+            margin-top: 8px;
+        }
+        .estado-actual-content {
+            flex: 1;
+        }
+        .estado-actual-title {
+            font-weight: 700;
+            font-size: 1.19em;
+            margin-bottom: 4px;
+            color: #b38004;
+        }
+        .estado-actual-label {
+            font-size: 1.08em;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .estado-actual-list {
+            margin: 0;
+            padding-left: 22px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Seleccione Patente</div>
+    <div class="container" id="cards-container">Cargando datos...</div>
+    <div class="footer-btn">
+        <button class="btn" id="continue-btn" disabled>→ Continuar</button>
+    </div>
+    <div id="history-sheet" class="info-sheet" style="display:none;"></div>
+    <div id="info-sheet" class="info-sheet" style="display:none;"></div>
+
+<script>
+const sheetId = "1sDZeHxPlkdKfjHIL7tJKf5GwH6vraJ6sReEbdgLkATU";
+const apiKey = "AIzaSyBXSsK-fg2PE-pWmTocNTZB0nzsfuofrng";
+const range = "ACEITE!A1:AH100";
+const sheetsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+let selectedPatente = null;
+let patenteToCard = {};
+
+const sectionsByCol = [
+  { name: "Sistema Luces", cols: [3,4,5,6,7,8] },
+  { name: "Exterior", cols: [9,10,11,12,13,14,15,16,17,18] },
+  { name: "Interior", cols: [19,20,21,22,23] },
+  { name: "Neumáticos", cols: [24,25,26,27,28] },
+  { name: "Otros", cols: [29,30,31,32,33] }
+];
+
+function getMotivosAlerta(row, headers) {
+    const motivos = [];
+    function idx(nombre) { return headers.indexOf(nombre); }
+    const luces = [
+      "Luz delantera alta",
+      "Luz delantera baja",
+      "Luces de emergencia",
+      "Direccional derecha",
+      "Direccional izquierda",
+      "Luces freno"
+    ];
+    for (let nombre of luces) {
+        const i = idx(nombre);
+        if(i>-1 && (row[i]||"").toLowerCase().trim() === "malo")
+            motivos.push(`${nombre} en mal estado`);
+    }
+    const piqueteParabrisasIdx = idx("Parabrisas delantero - Cantidad Piquete/Trizadura");
+    if (piqueteParabrisasIdx>-1 && row[piqueteParabrisasIdx] && Number(row[piqueteParabrisasIdx])>0)
+        motivos.push(`${row[piqueteParabrisasIdx]} trizadura${Number(row[piqueteParabrisasIdx])>1?'s':''} en parabrisas delantero`);
+    const piqueteEspejosIdx = idx("Espejos laterales - Cantidad Piquete/Trizaduras");
+    if (piqueteEspejosIdx>-1 && row[piqueteEspejosIdx] && Number(row[piqueteEspejosIdx])>0)
+        motivos.push(`${row[piqueteEspejosIdx]} trizadura${Number(row[piqueteEspejosIdx])>1?'s':''} en espejos laterales`);
+    const abolladurasSIIdx = idx("Abolladuras");
+    const abolladurasCantIdx = idx("Abolladuras - Cantidad ");
+    if (abolladurasSIIdx>-1 && abolladurasCantIdx>-1) {
+        let abolla = (row[abolladurasSIIdx]||"").toLowerCase().trim();
+        let c = Number(row[abolladurasCantIdx]);
+        if ((abolla==="sí" || abolla==="si") && c>0)
+            motivos.push(`${c} abolladura${c>1?'s':''} en carrocería`);
+        else if ((abolla==="sí" || abolla==="si") && (!c || c===0))
+            motivos.push(`Abolladuras presentes en carrocería`);
+    }
+    const interior = [
+      "Estado tablero",
+      "Freno de mano",
+      "Pedal freno",
+      "Pedal acelerador",
+      "Pedal embrague"
+    ];
+    for(let nombre of interior) {
+        const i = idx(nombre);
+        if(i>-1 && (row[i]||"").toLowerCase().trim()==="malo")
+            motivos.push(`${nombre} en mal estado`);
+    }
+    const neumaticos = [
+      "Neumático delantero derecho",
+      "Neumático delantero izquierdo",
+      "Neumático posterior derecho",
+      "Neumático posterior izquierdo"
+    ];
+    for(let nombre of neumaticos) {
+        const i = idx(nombre);
+        if(i>-1 && (row[i]||"").toLowerCase().trim()==="malo")
+            motivos.push(`${nombre} en mal estado`);
+    }
+    const repuestoIdx = idx("Neumático de repuesto");
+    if(repuestoIdx>-1){
+        let val = (row[repuestoIdx]||"").toLowerCase().trim();
+        if(val.includes("sin") || val === "" || val === "no" || val === "0" || val === "n/a")
+            motivos.push("Falta neumático de repuesto");
+    }
+    const otrosCampos = [
+        { col: "Copia revisión técnica", falta: "Falta copia de revisión técnica" },
+        { col: "Copia SOAP", falta: "Falta SOAP" },
+        { col: "Gata hidráulica", falta: "Falta gata hidráulica" },
+        { col: "Botiquin", falta: "Falta botiquín" }
+    ];
+    for(let o of otrosCampos){
+        const i = idx(o.col);
+        if(i>-1){
+            let val = (row[i]||"").toLowerCase().trim();
+            if(val===""||val==="no"||val==="n/a"||val==="0")
+                motivos.push(o.falta);
+        }
+    }
+    return motivos;
+}
+
+function getCardStatus(row, headers) {
+    let malos = 0, abolladuras = 0, faltanOtros = 0, sinRepuesto = false;
+    for(let i=3; i<=8; i++) if((row[i]||"").toLowerCase().trim()==="malo") malos++;
+    for(let i=9; i<=18; i++) {
+        let val = (row[i]||"").toLowerCase().trim();
+        if(val==="malo") malos++;
+        if(val.includes("piquete")||val.includes("abolladura")||val.includes("trizadura")||val==="sí"||val==="si") abolladuras++;
+    }
+    for(let i=19; i<=23; i++) if((row[i]||"").toLowerCase().trim()==="malo") malos++;
+    for(let i=24; i<=28; i++) {
+        let val = (row[i]||"").toLowerCase().trim();
+        if(val==="malo") malos++;
+        if(i===28 && (val.includes("sin")||val==="no"||val==="n/a"||val===""||val==="0")) sinRepuesto=true;
+    }
+    for(let i=29; i<=32; i++) {
+        let val = (row[i]||"").toLowerCase().trim();
+        if(val===""||val==="no"||val==="n/a"||val==="0") faltanOtros++;
+    }
+    if(sinRepuesto || faltanOtros===4 || malos>=2) return "red";
+    if (malos>=1 || abolladuras>=1 || faltanOtros>0) return "yellow";
+    return "green";
+}
+
+function daysUntilDate(dateStr) {
+    const today = new Date();
+    const parts = dateStr.split('-');
+    if(parts.length !== 3) return null;
+    const [yyyy, mm, dd] = parts;
+    const date = new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+    const diffTime = date - today;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function createEstadoActualElement(lastRow, headers) {
+    const motivos = getMotivosAlerta(lastRow, headers);
+    const status = getCardStatus(lastRow, headers);
+
+    let icon = "✔️", title = "Estado actual: OK", label = "¡Sin observaciones!", iconColor = "#388e3c";
+
+    if(status === "yellow") {
+        icon = "⚠️";
+        title = "Estado actual: Atención";
+        label = "Observaciones:";
+        iconColor = "#ba7e0e";
+    } else if(status === "red") {
+        icon = "❗";
+        title = "Estado actual: CRÍTICO";
+        label = "Problemas críticos:";
+        iconColor = "#d32f2f";
+    }
+
+    const estadoDiv = document.createElement('div');
+    estadoDiv.className = "estado-actual-panel";
+    estadoDiv.style.color = iconColor;
+    estadoDiv.innerHTML = `
+        <div class="estado-actual-icon">${icon}</div>
+        <div class="estado-actual-content">
+            <div class="estado-actual-title">${title}</div>
+            <div class="estado-actual-label">${label}</div>
+            ${
+                motivos.length ? `<ul class="estado-actual-list">${motivos.map(m=>`<li>${m}</li>`).join('')}</ul>` 
+                : `<div style="color:${status==='green' ? '#388e3c' : '#666'}; font-weight: bold;">
+                    ${status==='green' ? 'Todo en regla en la última revisión.' : 'Sin observaciones específicas.'}
+                </div>`
+            }
+            <div style="font-size:0.9em; margin-top:6px; color:#666;">
+                Fecha última revisión: <b>${lastRow[0]||'-'}</b>
+            </div>
+        </div>
+    `;
+    return estadoDiv;
+}
+
+function renderCards(data) {
+    // Ordena los datos por prioridad: rojo -> amarillo -> verde
+    data.sort((a, b) => {
+        const estadoA = getCardType(a['KM FALTANTES CAMBIO']);
+        const estadoB = getCardType(b['KM FALTANTES CAMBIO']);
+        // Prioridad: red (0), yellow (1), green (2)
+        const prioridad = { red: 0, yellow: 1, green: 2 };
+        return prioridad[estadoA] - prioridad[estadoB];
+    });
+
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '';
+    patenteToCard = {};
+    data.forEach(row => {
+        if(!row['PATENTE'] || !row['KM FALTANTES CAMBIO']) return;
+        const patente = row['PATENTE'];
+        const kmRestantes = row['KM FALTANTES CAMBIO'];
+        const proxRevision = row['PROXIMA REVISION TECNICA'] || '';
+        const cardType = getCardType(kmRestantes);
+        const icon = getCardIcon(cardType);
+        const showUrgente = (cardType === 'red');
+
+        const diasRestantes = proxRevision ? daysUntilDate(proxRevision.split('-').reverse().join('-')) : null;
+
+        const card = document.createElement('div');
+        card.className = `card ${cardType}`;
+        card.innerHTML = `
+            <div class="patente">
+                <span class="icon">🚚</span>
+                ${patente}
+                <span class="status-icon" title="Estado">${icon}</span>
+            </div>
+            <div class="km-restantes ${cardType}">
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>Kilómetros restantes:</span>
+                    <span>${kmRestantes} km</span>
+                </div>
+                ${proxRevision ? `
+                <div class="info-revision">
+                    <span class="icon">📋</span>
+                    <span><strong>Próxima revisión técnica:</strong> ${proxRevision} ${diasRestantes !== null ? `(${diasRestantes} días restantes)` : ''}</span>
+                </div>` : ''}
+                ${showUrgente ? `<div class="urgente" style="margin-top:6px;"><span class="icon">⚠️</span> ¡Mantenimiento urgente!</div>` : ""}
+                <div class="estado-actual-placeholder">Cargando estado actual...</div>
+            </div>
+        `;
+
+        container.appendChild(card);
+        patenteToCard[patente] = card;
+
+        // Obtener datos específicos de la patente para mostrar estado actual
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(patente)}!A1:AH100?key=${apiKey}`)
+        .then(res => res.json())
+        .then(dataSheet => {
+            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
+            if(!dataSheet.values || dataSheet.values.length < 2){
+                estadoDivPlaceholder.textContent = 'Sin revisiones disponibles.';
+                return;
+            }
+            const headers = dataSheet.values[0];
+            const rowsSheet = dataSheet.values.slice(1);
+            rowsSheet.sort((a,b) => {
+                function fechaToNum(f){
+                    if(!f || f.length < 8) return 0;
+                    let [d,m,y] = f.split('/');
+                    return Number(y + m.padStart(2,'0') + d.padStart(2,'0'));
+                }
+                return fechaToNum(b[0]) - fechaToNum(a[0]);
+            });
+            const lastRowSheet = rowsSheet[0];
+            const estadoElement = createEstadoActualElement(lastRowSheet, headers);
+            estadoDivPlaceholder.innerHTML = '';
+            estadoDivPlaceholder.appendChild(estadoElement);
+        })
+        .catch(() => {
+            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
+            estadoDivPlaceholder.textContent = 'Error al cargar estado actual.';
+        });
+
+        // Selección y habilitar botón
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedPatente = patente;
+            document.getElementById('continue-btn').disabled = false;
+        });
+    });
+}
+
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '';
+    patenteToCard = {};
+    data.forEach(row => {
+        if(!row['PATENTE'] || !row['KM FALTANTES CAMBIO']) return;
+        const patente = row['PATENTE'];
+        const kmRestantes = row['KM FALTANTES CAMBIO'];
+        const proxRevision = row['PROXIMA REVISION TECNICA'] || '';
+        const cardType = getCardType(kmRestantes);
+        const icon = getCardIcon(cardType);
+        const showUrgente = (cardType === 'red');
+
+        const diasRestantes = proxRevision ? daysUntilDate(proxRevision.split('-').reverse().join('-')) : null;
+
+        const card = document.createElement('div');
+        card.className = `card ${cardType}`;
+        card.innerHTML = `
+            <div class="patente">
+                <span class="icon">🚚</span>
+                ${patente}
+                <span class="status-icon" title="Estado">${icon}</span>
+            </div>
+            <div class="km-restantes ${cardType}">
+                <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                    <span>Kilómetros restantes:</span>
+                    <span>${kmRestantes} km</span>
+                </div>
+                ${proxRevision ? `
+                <div class="info-revision">
+                    <span class="icon">📋</span>
+                    <span><strong>Próxima revisión técnica:</strong> ${proxRevision} ${diasRestantes !== null ? `(${diasRestantes} días restantes)` : ''}</span>
+                </div>` : ''}
+                ${showUrgente ? `<div class="urgente" style="margin-top:6px;"><span class="icon">⚠️</span> ¡Mantenimiento urgente!</div>` : ""}
+                <div class="estado-actual-placeholder">Cargando estado actual...</div>
+            </div>
+        `;
+
+        container.appendChild(card);
+        patenteToCard[patente] = card;
+
+        // Obtener datos específicos de la patente para mostrar estado actual
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(patente)}!A1:AH100?key=${apiKey}`)
+        .then(res => res.json())
+        .then(dataSheet => {
+            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
+            if(!dataSheet.values || dataSheet.values.length < 2){
+                estadoDivPlaceholder.textContent = 'Sin revisiones disponibles.';
+                return;
+            }
+            const headers = dataSheet.values[0];
+            const rowsSheet = dataSheet.values.slice(1);
+            rowsSheet.sort((a,b) => {
+                function fechaToNum(f){
+                    if(!f || f.length < 8) return 0;
+                    let [d,m,y] = f.split('/');
+                    return Number(y + m.padStart(2,'0') + d.padStart(2,'0'));
+                }
+                return fechaToNum(b[0]) - fechaToNum(a[0]);
+            });
+            const lastRowSheet = rowsSheet[0];
+            const estadoElement = createEstadoActualElement(lastRowSheet, headers);
+            estadoDivPlaceholder.innerHTML = '';
+            estadoDivPlaceholder.appendChild(estadoElement);
+        })
+        .catch(() => {
+            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
+            estadoDivPlaceholder.textContent = 'Error al cargar estado actual.';
+        });
+
+        // Selección y habilitar botón
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedPatente = patente;
+            document.getElementById('continue-btn').disabled = false;
+        });
+    });
+
+
+function getCardType(kmStr) {
+    if (!kmStr) return 'green';
+    const km = parseInt(kmStr.replace(/\./g,'').replace(/,/g,'').replace(/\s/g,''));
+    if (isNaN(km)) return 'green';
+    if (km >= 7000) return 'green';
+    if (km >= 3000) return 'yellow';
+    return 'red';
+}
+function getCardIcon(cardType) {
+    if (cardType === 'green') return '✔️';
+    if (cardType === 'yellow') return '⚠️';
+    if (cardType === 'red') return '❗';
+    return 'ℹ️';
+}
+
+document.getElementById('continue-btn').addEventListener('click', () => {
+    if(selectedPatente){
+        showSheetHistory(selectedPatente);
+    }
+});
+
+function showSheetHistory(patente) {
+    const histDiv = document.getElementById('history-sheet');
+    histDiv.innerHTML = "Cargando historial de revisiones...";
+    histDiv.style.display = "block";
+    document.getElementById('info-sheet').style.display = "none";
+    document.querySelector('.container').style.display = "none";
+    document.querySelector('.footer-btn').style.display = "none";
+
+    const dataRange = `${patente}!A1:AH100`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(dataRange)}?key=${apiKey}`;
+
+    fetch(url)
+    .then(r => r.json())
+    .then(data => {
+        if (!data.values || data.values.length < 2) {
+            histDiv.innerHTML = `<b>No se encontraron revisiones para "${patente}"</b><br><button class="back-btn" onclick="backToCards()">← Volver</button>`;
+            return;
+        }
+        const headers = data.values[0];
+        let rows = data.values.slice(1);
+
+        rows.sort((a,b) => {
+            function fechaToNum(f) {
+                if(!f || f.length < 8) return 0;
+                let [d,m,y] = f.split('/');
+                return Number(y + m.padStart(2,'0') + d.padStart(2,'0'));
+            }
+            return fechaToNum(b[0]) - fechaToNum(a[0]);
+        });
+
+        let html = `<h2 style="margin-bottom:2px;">${patente}</h2>
+            <div style="font-size:1.07em;color:#868fa1;">Elija la revisión que desea ver</div>
+            <div style="margin-top:24px;">`;
+
+        rows.forEach(row => {
+            const fecha = row[0] || "-";
+            const usuario = row[1] || "-";
+            let km = row[2] || "-";
+            if(km && km !== "-") km = Number(km).toLocaleString("es-CL");
+            const status = getCardStatus(row, headers);
+            let icon, estadoText, estadoColor;
+            if(status === "red") {
+                icon = "❗";
+                estadoText = "CRÍTICO";
+                estadoColor = "#d32f2f";
+            } else if(status === "yellow") {
+                icon = "⚠️";
+                estadoText = "Atención";
+                estadoColor = "#ba7e0e";
+            } else {
+                icon = "✔️";
+                estadoText = "OK";
+                estadoColor = "#388e3c";
+            }
+            const motivos = getMotivosAlerta(row, headers);
+            const filaEncoded = encodeURIComponent(JSON.stringify(row));
+            html += `
+                <div class="history-card ${status}" onclick="showSheetInfo('${patente}', '${filaEncoded}')">
+                    <div style="margin:0 14px 0 12px; font-size:2em;">${icon}</div>
+                    <div style="flex:1; padding:14px 0;">
+                        <div style="font-weight:bold; font-size:1.09em;">Fecha: ${fecha}</div>
+                        <div style="font-size:0.99em;color:#333;">Usuario: <b>${usuario}</b></div>
+                        <div style="font-size:0.99em;color:#333;">Kilometraje: <b>${km}</b></div>
+                        ${(motivos.length && status !== "green") ? `
+                            <div class="motivos-alerta"><ul>${motivos.map(m=>`<li>${m}</li>`).join("")}</ul></div>` : ""}
+                    </div>
+                    <div style="margin-right:18px; color:${estadoColor};font-weight:700;font-size:1.17em;">${estadoText}</div>
+                    <div style="margin-right:12px;font-size:1.5em;color:#3949ab;">→</div>
+                </div>
+            `;
+        });
+        html += `</div><button class="back-btn" onclick="backToCards()">← Volver</button>`;
+        histDiv.innerHTML = html;
+    })
+    .catch(() => {
+        histDiv.innerHTML = `<b>No se pudo cargar el historial.</b><br><button class="back-btn" onclick="backToCards()">← Volver</button>`;
+    });
+}
+
+function showSheetInfo(patente, filaEncoded) {
+    const infoDiv = document.getElementById('info-sheet');
+    infoDiv.innerHTML = "Cargando información de la patente...";
+    infoDiv.style.display = "block";
+    document.getElementById('history-sheet').style.display = "none";
+    document.querySelector('.container').style.display = "none";
+    document.querySelector('.footer-btn').style.display = "none";
+
+    const dataRange = `${patente}!A1:AH1`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(dataRange)}?key=${apiKey}`;
+
+    fetch(url)
+    .then(r => r.json())
+    .then(data => {
+        const headers = data.values[0];
+        const lastRow = JSON.parse(decodeURIComponent(filaEncoded));
+        let html = `<h2 style="color:#3949ab;margin-top:0;font-size:1.23em;">${patente}</h2>`;
+        html += `<div style="font-size:1.06em;color:#333;margin-bottom:18px;">Datos del control seleccionado</div>`;
+
+        sectionsByCol.forEach(section => {
+            html += `<div class="section-title">${section.name}</div>`;
+            html += `<table class="section-table"><tbody>`;
+            let showed = 0;
+            section.cols.forEach(idx => {
+                const colName = headers[idx];
+                const val = lastRow[idx] ? lastRow[idx].trim() : "";
+                if (val && val !== "" && val !== "0" && val.toLowerCase() !== "no" && val.toLowerCase() !== "n/a") {
+                    let statusClass = "";
+                    let rowCritico = false;
+                    const normVal = val.toLowerCase();
+                    if (["malo", "vacío", "sin neumático de repuesto"].includes(normVal)) {
+                        statusClass = "critico";
+                        rowCritico = true;
+                    } else if (["por mejorar", "piquete", "trizadura"].includes(normVal)) {
+                        statusClass = "atencion";
+                        rowCritico = true;
+                    } else if (["bueno", "sí", "si"].includes(normVal)) {
+                        statusClass = "ok";
+                    }
+                    if (colName && colName.toLowerCase().includes('abolladura') && val !== "0" && val.toLowerCase() !== "no") {
+                        rowCritico = true;
+                    }
+                    if (colName && colName.toLowerCase().includes("neumático de repuesto") &&
+                        (normVal.includes("sin") || normVal === "" || normVal === "no" || normVal === "0" || normVal === "n/a")) {
+                        rowCritico = true;
+                        statusClass = "critico";
+                    }
+                    if (["copia revisión técnica", "copia soap", "botiquin", "gata hidráulica"].some(doc =>
+                        colName.toLowerCase().includes(doc)) &&
+                        (normVal === "" || normVal === "no" || normVal === "n/a" || normVal === "0")) {
+                        rowCritico = true;
+                        statusClass = "critico";
+                    }
+                    const trClass = rowCritico ? 'tr-critico' : '';
+                    if (colName && colName.toLowerCase().includes('url') && val.startsWith("http")) {
+                        html += `<tr class="${trClass}"><td>${colName.replace("URL ","")}</td><td><a href="${val}" target="_blank">Ver Imagen</a></td></tr>`;
+                    } else {
+                        html += `<tr class="${trClass}"><td>${colName.replace(/ - .*$/,"")}</td><td class="${statusClass}">${val}</td></tr>`;
+                    }
+                    showed++;
+                }
+            });
+            if (!showed) html += `<tr><td colspan="2" style="color:#bbb;font-style:italic;">Sin datos</td></tr>`;
+            html += `</tbody></table>`;
+        });
+
+        html += `<button class="back-btn" onclick="backToHistory('${patente}')">← Volver</button>`;
+        infoDiv.innerHTML = html;
+    })
+    .catch(() => {
+        infoDiv.innerHTML = `<b>No se pudo cargar la información.</b><br><button class="back-btn" onclick="backToHistory('${patente}')">← Volver</button>`;
+    });
+}
+
+function backToCards() {
+    document.getElementById('info-sheet').style.display = "none";
+    document.getElementById('history-sheet').style.display = "none";
+    document.querySelector('.container').style.display = "block";
+    document.querySelector('.footer-btn').style.display = "flex";
+
+    // Eliminar estado actual si existe
+    document.querySelectorAll('.estado-actual-panel').forEach(el => el.remove());
+}
+function backToHistory(patente) {
+    document.getElementById('info-sheet').style.display = "none";
+    showSheetHistory(patente);
+}
+</script>
+
+<script>
+fetch(sheetsUrl)
+  .then(r => r.json())
+  .then(data => {
+    if (!data.values) throw new Error();
+    const headers = data.values[0];
+    const rows = data.values.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h.trim()] = (row[i]||'').trim());
+      return obj;
+    });
+    renderCards(rows);
+  })
+  .catch(() => {
+    document.getElementById('cards-container').innerHTML = 'No se pudo cargar la información.';
+  });
+
+document.getElementById('continue-btn').addEventListener('click', function() {
+    if(selectedPatente){
+        showSheetHistory(selectedPatente);
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Principal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #e9ecf8;
+      font-family: Segoe UI, Arial, sans-serif;
+      overflow: hidden;
+    }
+    .switch-arrow {
+      position: fixed;
+      top: 18px;
+      right: 26px;
+      z-index: 99;
+      background: #354bb2;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 2em;
+      box-shadow: 0 3px 16px #0003;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.93;
+      transition: background 0.2s;
+    }
+    .switch-arrow:hover {
+      background: #222c8c;
+      opacity: 1;
+    }
+    #main-frame {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Flecha para cambiar manualmente -->
+  <button class="switch-arrow" id="switchArrow" title="Siguiente página">&#8594;</button>
+  <!-- Iframe para cargar cada página -->
+  <iframe id="main-frame" src="fechas.html"></iframe>
+  <script>
+    // 0 = fechas, 1 = flota
+    let paginas = ['fechas.html', 'flota.html'];
+    let actual = 0;
+    let timer = null;
+
+    function mostrarPagina(idx) {
+      actual = idx;
+      document.getElementById('main-frame').src = paginas[idx];
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        mostrarPagina((actual+1)%2);
+      }, 300000); // 5 minutos = 300000 ms
+    }
+
+    document.getElementById('switchArrow').onclick = function() {
+      mostrarPagina((actual+1)%2);
+    };
+
+    // Inicializar en página 0 (fechas)
+    mostrarPagina(0);
+  </script>
+</body>
+</html>
