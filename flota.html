@@ -85,6 +85,18 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.45; }
         }
+        .fecha-ultimo-control {
+            font-size: 0.95em;
+            color: #3949ab;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .kilometraje-ultimo-control {
+            font-size: 0.95em;
+            color: #3949ab;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
         .patente {
             font-size: 1.35rem;
             font-weight: bold;
@@ -502,11 +514,26 @@ function renderCards(data) {
         const icon = getCardIcon(cardType);
         const showUrgente = (cardType === 'red');
 
-        const diasRestantes = proxRevision ? daysUntilDate(proxRevision.split('-').reverse().join('-')) : null;
+        const diasRestantes = proxRevision
+          ? daysUntilDate(proxRevision.split('-').reverse().join('-'))
+          : null;
+
+        // *** FECHA ÚLTIMO CONTROL (columna E) ***
+        const fechaUltimoControl = row['FECHA ULTIMO CONTROL'] && row['FECHA ULTIMO CONTROL'].trim() !== ""
+            ? row['FECHA ULTIMO CONTROL']
+            : "SIN CONTROL REGISTRADO";
+
+        // *** KILOMETRAJE ÚLTIMO CONTROL (columna F) ***
+        const kmUltimoControlBruto = row['KM ULTIMO CONTROL'];
+        const kmUltimoControl = kmUltimoControlBruto && kmUltimoControlBruto.trim() !== ""
+            ? kmUltimoControlBruto.trim() + " km"
+            : "SIN CONTROL REGISTRADO";
 
         const card = document.createElement('div');
         card.className = `card ${cardType}`;
         card.innerHTML = `
+            <div class="fecha-ultimo-control">${fechaUltimoControl}</div>
+            <div class="kilometraje-ultimo-control">Kilometraje último control: ${kmUltimoControl}</div>
             <div class="patente">
                 <span class="icon">🚚</span>
                 ${patente}
@@ -514,7 +541,7 @@ function renderCards(data) {
             </div>
             <div class="km-restantes ${cardType}">
                 <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                    <span>Kilómetros restantes:</span>
+                    <span>Siguiente mantenimiento en:</span>
                     <span>${kmRestantes} km</span>
                 </div>
                 ${proxRevision ? `
@@ -756,9 +783,7 @@ function backToHistory(patente) {
     document.getElementById('info-sheet').style.display = "none";
     showSheetHistory(patente);
 }
-</script>
 
-<script>
 fetch(sheetsUrl)
   .then(r => r.json())
   .then(data => {
@@ -774,12 +799,6 @@ fetch(sheetsUrl)
   .catch(() => {
     document.getElementById('cards-container').innerHTML = 'No se pudo cargar la información.';
   });
-
-document.getElementById('continue-btn').addEventListener('click', function() {
-    if(selectedPatente){
-        showSheetHistory(selectedPatente);
-    }
-});
 </script>
 </body>
 </html>
