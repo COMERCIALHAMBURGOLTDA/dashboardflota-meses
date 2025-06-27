@@ -267,6 +267,40 @@
             margin: 0;
             padding-left: 22px;
         }
+        /* =================
+            CAMBIOS SOLICITADOS
+           ===================*/
+        /* Texto negro y negrita para tarjetas y tablas */
+        .card,
+        .card .patente,
+        .card .km-restantes,
+        .card .info-revision,
+        .card .urgente,
+        .card .estado-actual-placeholder {
+            color: #111 !important;
+            font-weight: bold !important;
+        }
+        .km-restantes > div,
+        .km-restantes .info-revision {
+            color: #111 !important;
+            font-weight: bold !important;
+        }
+        .info-sheet,
+        .section-title,
+        .section-table th,
+        .section-table td {
+            color: #111 !important;
+            font-weight: bold !important;
+        }
+        .history-card {
+            color: #111 !important;
+            font-weight: bold !important;
+        }
+        /* Para toda la página, opcional: */
+        body, .container, .footer-btn, .btn, .back-btn {
+            color: #111 !important;
+            font-weight: bold !important;
+        }
     </style>
 </head>
 <body>
@@ -534,85 +568,6 @@ function renderCards(data) {
         });
     });
 }
-
-    const container = document.getElementById('cards-container');
-    container.innerHTML = '';
-    patenteToCard = {};
-    data.forEach(row => {
-        if(!row['PATENTE'] || !row['KM FALTANTES CAMBIO']) return;
-        const patente = row['PATENTE'];
-        const kmRestantes = row['KM FALTANTES CAMBIO'];
-        const proxRevision = row['PROXIMA REVISION TECNICA'] || '';
-        const cardType = getCardType(kmRestantes);
-        const icon = getCardIcon(cardType);
-        const showUrgente = (cardType === 'red');
-
-        const diasRestantes = proxRevision ? daysUntilDate(proxRevision.split('-').reverse().join('-')) : null;
-
-        const card = document.createElement('div');
-        card.className = `card ${cardType}`;
-        card.innerHTML = `
-            <div class="patente">
-                <span class="icon">🚚</span>
-                ${patente}
-                <span class="status-icon" title="Estado">${icon}</span>
-            </div>
-            <div class="km-restantes ${cardType}">
-                <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                    <span>Kilómetros restantes:</span>
-                    <span>${kmRestantes} km</span>
-                </div>
-                ${proxRevision ? `
-                <div class="info-revision">
-                    <span class="icon">📋</span>
-                    <span><strong>Próxima revisión técnica:</strong> ${proxRevision} ${diasRestantes !== null ? `(${diasRestantes} días restantes)` : ''}</span>
-                </div>` : ''}
-                ${showUrgente ? `<div class="urgente" style="margin-top:6px;"><span class="icon">⚠️</span> ¡Mantenimiento urgente!</div>` : ""}
-                <div class="estado-actual-placeholder">Cargando estado actual...</div>
-            </div>
-        `;
-
-        container.appendChild(card);
-        patenteToCard[patente] = card;
-
-        // Obtener datos específicos de la patente para mostrar estado actual
-        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(patente)}!A1:AH100?key=${apiKey}`)
-        .then(res => res.json())
-        .then(dataSheet => {
-            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
-            if(!dataSheet.values || dataSheet.values.length < 2){
-                estadoDivPlaceholder.textContent = 'Sin revisiones disponibles.';
-                return;
-            }
-            const headers = dataSheet.values[0];
-            const rowsSheet = dataSheet.values.slice(1);
-            rowsSheet.sort((a,b) => {
-                function fechaToNum(f){
-                    if(!f || f.length < 8) return 0;
-                    let [d,m,y] = f.split('/');
-                    return Number(y + m.padStart(2,'0') + d.padStart(2,'0'));
-                }
-                return fechaToNum(b[0]) - fechaToNum(a[0]);
-            });
-            const lastRowSheet = rowsSheet[0];
-            const estadoElement = createEstadoActualElement(lastRowSheet, headers);
-            estadoDivPlaceholder.innerHTML = '';
-            estadoDivPlaceholder.appendChild(estadoElement);
-        })
-        .catch(() => {
-            const estadoDivPlaceholder = card.querySelector('.estado-actual-placeholder');
-            estadoDivPlaceholder.textContent = 'Error al cargar estado actual.';
-        });
-
-        // Selección y habilitar botón
-        card.addEventListener('click', function() {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            selectedPatente = patente;
-            document.getElementById('continue-btn').disabled = false;
-        });
-    });
-
 
 function getCardType(kmStr) {
     if (!kmStr) return 'green';
