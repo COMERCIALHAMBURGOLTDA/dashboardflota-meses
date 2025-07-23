@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rutas despachadas</title>
+  <style>
+    :root {
+      --bg-page: #edf2f7;
+      --text-primary: #000;
+      --card-bg: #fff;
+      --shadow-light: rgba(0, 0, 0, 0.1);
+      --radius: 16px;
+      --spacing: 24px;
+      --color-ok: #00e676;
+      --color-warning: #ffeb3b;
+      --color-error: #f44336;
+      --text-on-color: #000;
+      --bg-section: #fafafa;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text-primary);
+    }
+    h1, h2 {
+      margin: var(--spacing) 0;
+      padding: 0 var(--spacing);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    #contenedor-rutas, #contenedor-ayer {
+      width: 100%;
+      padding: 0 var(--spacing);
+    }
+    details.ruta-bloque {
+      margin: var(--spacing) 0;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      box-shadow: 0 4px 16px var(--shadow-light);
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+    details.ruta-bloque[open] { box-shadow: 0 8px 32px var(--shadow-light); }
+    summary.ruta-header {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: var(--spacing);
+      font-size: 1.3rem;
+      font-weight: 700;
+      gap: 16px;
+      transition: background-color 0.3s, color 0.3s;
+      color: var(--text-on-color);
+    }
+    summary.ruta-header::-webkit-details-marker { display: none; }
+    summary.ruta-header .icon {
+      display: inline-block;
+      transition: transform 0.3s;
+      font-size: 1.5rem;
+    }
+    details[open] summary.ruta-header .icon { transform: rotate(90deg); }
+    summary.ruta-header.ok { background: var(--color-ok); }
+    summary.ruta-header.warning {
+      background: var(--color-warning);
+      animation: pulse-warning 1s infinite alternate;
+    }
+    summary.ruta-header.error {
+      background: var(--color-error);
+      animation: pulse-error 1s infinite alternate;
+    }
+    @keyframes pulse-warning { from { background: var(--color-warning); } to { background: #fff; } }
+    @keyframes pulse-error   { from { background: var(--color-error);   } to { background: #fff; } }
+    .ruta-summary {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px 24px;
+      align-items: center;
+    }
+    .mini-resumen {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-left: auto;
+    }
+    .mini-resumen .item { display: flex; align-items: center; gap: 8px; }
+    .mini-resumen .icon-status { font-size: 1.6rem; }
+    .section-content {
+      padding: var(--spacing);
+      border-top: 2px solid #e0e0e0;
+      background: var(--bg-section);
+    }
+    .resumen-productos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: var(--spacing);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .noenviados-titulo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: var(--spacing) 0 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: var(--spacing);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      font-size: 1.05rem;
+      text-align: left;
+    }
+    th { background: #e0e0e0; }
+    .tabla-cargaincompleta th { background: #fff9c4; }
+    .faltante  { color: var(--color-error);   font-weight: 700; }
+    .sobrecarga { color: var(--color-warning); font-weight: 700; }
+    .empty-msg {
+      color: #555;
+      font-size: 1.1rem;
+      font-style: italic;
+      padding: 16px 0;
+      text-align: center;
+    }
+    .enlace-sheet {
+      display: block;
+      font-size: 1rem;
+      color: #2266cc;
+      font-weight: 500;
+      margin: 4px 0 0 0;
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      .ruta-summary { grid-template-columns: 1fr; }
+      .mini-resumen { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="titulo-rutas"></h1>
+  <div id="contenedor-rutas"></div>
+  <h2 id="titulo-ayer"></h2>
+  <div id="contenedor-ayer"></div>
+
+  <script>
+    // Fechas
+    const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    const hoy = new Date(), ayer = new Date(hoy);
+    ayer.setDate(hoy.getDate() - 1);
+    function formatearDisplay(d) {
+      const dd = String(d.getDate()).padStart(2,'0'),
+            mm = String(d.getMonth()+1).padStart(2,'0');
+      return `${dd}/${mm}/${d.getFullYear()}`;
+    }
+    function formatearSheet(d) {
+      const dd = String(d.getDate()).padStart(2,'0'),
+            mm = String(d.getMonth()+1).padStart(2,'0');
+      return `${dd}-${mm}-${d.getFullYear()}`;
+    }
+    const hoyDisp = formatearDisplay(hoy),
+          ayerDisp = formatearDisplay(ayer),
+          hoySheet = formatearSheet(hoy),
+          ayerSheet = formatearSheet(ayer);
+    document.getElementById('titulo-rutas').textContent =
+      `Rutas despachadas hoy ${dias[hoy.getDay()]} ${hoyDisp}`;
+    document.getElementById('titulo-ayer').textContent =
+      `Rutas despachadas ayer ${dias[ayer.getDay()]} ${ayerDisp}`;
+
+    // Constantes API
+    const API_KEY = "AIzaSyCH6an-WnJJ8xYpFSNB7Nj9CFc-JK0Cybo";
+    const FOLDER_ID = "1myYCVrhROuDRIxBjBt-5ffENYKMOGXyS";
+    const SECCIONES_RESUMEN = ["BULTOS","UNIDADES","CHICLES BULTOS","UNIDADES CHICLES"];
+    const RANGE_GENERAL = "A2:D2", RANGE_DETALLE = "A1:K100";
+
+    function getStatusClass(noC, inc) {
+      if (noC > 0) return "error";
+      if (inc > 0) return "warning";
+      return "ok";
+    }
+    function getStatusIcon(tipo) {
+      if (tipo === "ok")      return `<span class="icon-status" title="Sin errores">✔️</span>`;
+      if (tipo === "warning") return `<span class="icon-status" title="Incompletos">⚠️</span>`;
+      if (tipo === "error")   return `<span class="icon-status" title="No cargados">❌</span>`;
+      return "";
+    }
+    function miniResumen(total, skus, noC, inc) {
+      const cls = getStatusClass(noC, inc);
+      return `<div class="mini-resumen">
+        <div class="item">${getStatusIcon(cls)}</div>
+        <div class="item">Productos a cargar: ${total}</div>
+        <div class="item">| SKU único: ${skus}</div>
+        <div class="item">| No cargados: ${noC}</div>
+        <div class="item">| Incompletos: ${inc}</div>
+      </div>`;
+    }
+
+    // Recibe además el objeto ruta para usar su id y name
+    function rutaSummary(gen, tot, skus, noC, inc, ruta) {
+      let enlace = "";
+      if (ruta && ruta.id) {
+        enlace = `<a class="enlace-sheet" href="https://docs.google.com/spreadsheets/d/${ruta.id}" target="_blank" title="Abrir hoja en Google Sheets">
+          📄 Ver archivo: ${ruta.name || 'Abrir hoja'}
+        </a>`;
+      }
+      return `
+        <span class="icon">▶</span>
+        <div class="ruta-summary">
+          <span>Ruta: <b>${gen[0]}</b></span>
+          <span>Patente: <b>${gen[1]}</b>${enlace ? '<br>' + enlace : ''}</span>
+          <span>Fecha: <b>${gen[2]}</b></span>
+          <span>Usuario: <b>${gen[3]}</b></span>
+        </div>
+        ${miniResumen(tot, skus, noC, inc)}
+      `;
+    }
+
+    async function procesarFecha(fechaSheet, contId, msg) {
+      const cont = document.getElementById(contId);
+      cont.innerHTML = `<div class="empty-msg">Cargando…</div>`;
+      const rutas = await fetchDriveSheets(fechaSheet);
+      const bloques = [];
+      for (const ruta of rutas) {
+        let gen = [];
+        for (const sec of SECCIONES_RESUMEN) {
+          const v = await fetchSheetData(ruta.id, sec, RANGE_GENERAL);
+          if (v.length && v[0].length >= 4) { gen = v[0]; break; }
+        }
+        while (gen.length < 4) gen.push('-');
+        let total = 0;
+        const skusSet = new Set();
+        const incs = [];
+        const nos = [];
+        for (const sec of SECCIONES_RESUMEN) {
+          const data = await fetchSheetData(ruta.id, sec, RANGE_DETALLE);
+          if (data.length > 1) {
+            total += data.length - 1;
+            data.slice(1).forEach(row => {
+              const code = row[4]?.trim();
+              const exp = row[6], carg = row[7], cargado = row[8];
+              if (code && (exp || carg)) skusSet.add(code);
+              if (carg !== '' && exp !== '' && carg != exp) {
+                incs.push({ hoja: sec, fila: row });
+              }
+              if (String(cargado).toUpperCase() === 'NO') {
+                nos.push({ hoja: sec, fila: row });
+              }
+            });
+          }
+        }
+
+        bloques.push({
+          status: getStatusClass(nos.length, incs.length),
+          html: `
+            <details class="ruta-bloque">
+              <summary class="ruta-header ${getStatusClass(nos.length, incs.length)}">
+                ${rutaSummary(gen, total, skusSet.size, nos.length, incs.length, ruta)}
+              </summary>
+              <div class="section-content">
+                <div class="resumen-productos">
+                  <span>Productos a cargar: ${total}</span> |
+                  <span> SKU único: ${skusSet.size}</span> |
+                  <span> No cargados: ${nos.length}</span> |
+                  <span> Incompletos: ${incs.length}</span>
+                </div>
+
+                <div class="noenviados-titulo">Productos con carga incompleta</div>
+                ${incs.length
+                  ? `<table class="tabla-cargaincompleta">
+                       <tr><th>Sección</th><th>Código</th><th>Nombre</th><th>Por cargar</th><th>Cargados</th><th>Tipo</th></tr>
+                       ${incs.map(o => `
+                         <tr>
+                           <td>${o.hoja}</td>
+                           <td>${o.fila[4]||'-'}</td>
+                           <td>${o.fila[5]||'-'}</td>
+                           <td>${o.fila[6]||'-'}</td>
+                           <td>${o.fila[7]||'-'}</td>
+                           <td>${
+     (!isNaN(+o.fila[7]) && !isNaN(+o.fila[6]))
+       ? (+o.fila[7] > +o.fila[6]
+           ? '<span class="sobrecarga">Sobrecarga</span>'
+           : (+o.fila[7] < +o.fila[6]
+               ? '<span class="faltante">Faltante</span>'
+               : ''))
+       : ''
+   }</td>
+                         </tr>`).join('')}
+                     </table>`
+                  : `<div class="empty-msg">No hay productos con carga incompleta.</div>`}
+
+                <div class="noenviados-titulo">Productos NO cargados</div>
+                ${nos.length
+                  ? `<table>
+                       <tr><th>Sección</th><th>Código</th><th>Nombre</th><th>Por cargar</th><th>Cargados</th><th>Cargado</th><th>Motivo</th><th>Detalle</th></tr>
+                       ${nos.map(o => `
+                         <tr>
+                           <td>${o.hoja}</td>
+                           <td>${o.fila[4]||'-'}</td>
+                           <td>${o.fila[5]||'-'}</td>
+                           <td>${o.fila[6]||'-'}</td>
+                           <td>${o.fila[7]||'-'}</td>
+                           <td>${o.fila[8]||'-'}</td>
+                           <td>${o.fila[9]||'-'}</td>
+                           <td>${o.fila[10]||'-'}</td>
+                         </tr>`).join('')}
+                     </table>`
+                  : `<div class="empty-msg">No hay productos no cargados.</div>`}
+              </div>
+            </details>`
+        });
+      }
+      if (!bloques.length) {
+        cont.innerHTML = `<div class="empty-msg">${msg} (${fechaSheet}).</div>`;
+      } else {
+        bloques.sort((a,b)=>{ const o={error:0,warning:1,ok:2}; return o[a.status]-o[b.status]; });
+        cont.innerHTML = bloques.map(b=>b.html).join('');
+      }
+    }
+
+    async function fetchDriveSheets(datePrefix = '') {
+      const conditions = [`'${FOLDER_ID}' in parents`, `mimeType='application/vnd.google-apps.spreadsheet'`];
+      if (datePrefix) conditions.push(`name contains '${datePrefix}'`);
+      const q = conditions.join(' and ');
+      const url =
+        `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}` +
+        `&key=${API_KEY}` +
+        `&includeItemsFromAllDrives=true&supportsAllDrives=true&fields=files(id,name)`;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        console.error(`Error al obtener archivos de Drive (${resp.status}): ${resp.statusText}`);
+        return [];
+      }
+      return (await resp.json()).files || [];
+    }
+
+    async function fetchSheetData(sheetId, sheetName, range) {
+      const url =
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}!${range}?key=${API_KEY}`;
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        console.error(`Error al obtener datos de "${sheetName}" (${resp.status}): ${resp.statusText}`);
+        return [];
+      }
+      return (await resp.json()).values || [];
+    }
+
+    // Ejecutar para hoy y ayer
+    procesarFecha(hoySheet,  'contenedor-rutas', 'No hay despachos cargados el día de hoy');
+    procesarFecha(ayerSheet, 'contenedor-ayer','No hay despachos cargados ayer');
+  </script>
+</body>
+</html>
