@@ -9,13 +9,13 @@
       background: #e3e7f1;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
       color: #111;
-      font-size: 1rem; /* Más pequeño */
+      font-size: 1.2rem; /* Más pequeño */
       font-weight: bold;
     }
     h1, h2 {
       margin: 14px 0;
       padding: 0 10px;
-      font-size: 1.5rem;
+      font-size: 1rem;
       font-weight: bold;
       color: #000;
     }
@@ -267,22 +267,19 @@
       if (partes.length === 0) return "0 segundos";
       return partes.join(" ");
     }
-    function resumenPorSeccionStr(seccionSumas, cargadosPorSec) {
-      const colores = {
-        "BULTOS":        "badge-cant badge-bultos",
-        "UNIDADES":      "badge-cant badge-unidades",
-        "CHICLES BULTOS":"badge-cant badge-chiclesbultos",
-        "UNIDADES CHICLES":"badge-cant badge-chiclesunidades"
-      };
-      let arr = Object.entries(seccionSumas)
-        .filter(([k, v]) => v > 0)
-        .map(([k, v]) => {
-          const cargados = cargadosPorSec && cargadosPorSec[k] ? cargadosPorSec[k] : 0;
-          return `<span class="${colores[k]||'badge-cant'}">${v} ${k}<span style="font-size:0.87em;font-weight:normal;"> (CARGADOS: ${cargados})</span></span>`;
-        });
-      if (!arr.length) return '';
-      return `<span class="badges-carga">${arr.join(' ')}</span>`;
-    }
+   function resumenPorSeccionStr(seccionSumas, cargadosPorSec) {
+  const colorCeleste = "badge-cant badge-bultos";
+  let arr = Object.entries(seccionSumas)
+    .filter(([k, v]) => v > 0)
+    .map(([k, v]) => {
+      const cargados = cargadosPorSec && cargadosPorSec[k] ? cargadosPorSec[k] : 0;
+      return `<span class="${colorCeleste}">${v} ${k}<span style="font-size:0.87em;font-weight:normal;"> (CARGADOS: ${cargados})</span></span>`;
+    });
+  if (!arr.length) return '';
+  return `<span class="badges-carga">${arr.join(' ')}</span>`;
+}
+
+
     function badgesEstadoPorSeccion(obj, clase, texto) {
       let badges = Object.entries(obj)
         .filter(([k, v]) => v > 0)
@@ -509,3 +506,4 @@
   </script>
 </body>
 </html>
+
