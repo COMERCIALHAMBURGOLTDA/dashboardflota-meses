@@ -4,77 +4,79 @@
   <meta charset="UTF-8">
   <title>Rutas despachadas</title>
   <style>
-    :root {
-      --bg-page: #edf2f7;
-      --color-ok-bg: #00ec8b;
-      --color-warning-bg: #ffe63b;
-      --color-error-bg: #ff4747;
-      --color-warning-bg2: #fff598;
-      --color-error-bg2: #ff8585;
-      --color-ok-bg2: #7cfcd3;
-      --text-primary: #000;
-      --badge-bultos-bg: #59bfff;
-      --badge-unidades-bg: #44ff9d;
-      --badge-chiclesbultos-bg: #ffd8a0;
-      --badge-chiclesunidades-bg: #e6c3ff;
-      --badge-bultos-b: #0b59b5;
-      --badge-unidades-b: #009245;
-      --badge-chiclesbultos-b: #ff9800;
-      --badge-chiclesunidades-b: #7304b3;
-    }
-    body {
+    html, body {
       margin: 0;
-      background: var(--bg-page);
+      background: #e3e7f1;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      color: #000;
-      font-size: 1.04rem;
+      color: #111;
+      font-size: 1rem; /* Más pequeño */
       font-weight: bold;
     }
     h1, h2 {
-      margin: 24px 0;
-      padding: 0 24px;
-      font-size: 1.55rem;
+      margin: 14px 0;
+      padding: 0 10px;
+      font-size: 1.5rem;
       font-weight: bold;
       color: #000;
     }
     #contenedor-rutas, #contenedor-ayer {
       width: 100%;
-      padding: 0 24px;
+      padding: 0 5px;
     }
-    details.ruta-bloque {
-      margin: 28px 0;
-      border-radius: 18px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    /* BLOQUES CON COLORES FUERTES Y TEXTO NEGRO */
+    .ruta-bloque.ok {
+      background: #13d27a;
+      border-left: 8px solid #007b3d;
+      border: 2px solid #000;
+      color: #000;
+    }
+    .ruta-bloque.warning {
+      background: #ffe23a;
+      border-left: 8px solid #c99800;
+      border: 2px solid #000;
+      color: #000;
+      animation: parpadea-warning 0.45s infinite alternate;
+    }
+    .ruta-bloque.error {
+      background: #ff3636;
+      border-left: 8px solid #980000;
+      border: 2px solid #000;
+      color: #000;
+      animation: parpadea-error 0.4s infinite alternate;
+    }
+    .ruta-bloque.morado {
+      background: #a24bf7;
+      border-left: 8px solid #4b0072;
+      border: 2px solid #000;
+      color: #000;
+      animation: parpadea-morado 0.6s infinite alternate;
+    }
+    .ruta-bloque {
+      margin: 18px 0 12px 0;
+      border-radius: 11px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
       overflow: hidden;
-      border: none;
-      transition: box-shadow 0.3s;
+      border-right: 2px solid #000;
+      font-weight: bold;
     }
-    .bloque-ok {
-      background: var(--color-ok-bg);
-      animation: none;
+    @keyframes parpadea-warning {
+      0%   { box-shadow: 0 0 10px 1px #ffe23a, 0 2px 8px #c99800; }
+      100% { box-shadow: 0 0 16px 3px #ffcb11, 0 5px 15px #c99800; }
     }
-    .bloque-warning {
-      background: var(--color-warning-bg);
-      animation: parpadeaAmarillo 0.5s infinite alternate;
+    @keyframes parpadea-error {
+      0%   { box-shadow: 0 0 10px 2px #ffaaaa, 0 2px 8px #980000; }
+      100% { box-shadow: 0 0 16px 3px #ff3636, 0 5px 15px #980000; }
     }
-    .bloque-error {
-      background: var(--color-error-bg);
-      animation: parpadeaRojo 0.5s infinite alternate;
+    @keyframes parpadea-morado {
+      0%   { box-shadow: 0 0 10px 1px #d9a6ff, 0 2px 8px #4b0072; }
+      100% { box-shadow: 0 0 16px 3px #a24bf7, 0 5px 15px #4b0072; }
     }
-    .bloque-pendiente { background: #fff !important; transition: background 0.2s; }
-    @keyframes parpadeaRojo {
-      0%   { background: var(--color-error-bg); }
-      100% { background: var(--color-error-bg2); }
-    }
-    @keyframes parpadeaAmarillo {
-      0%   { background: var(--color-warning-bg); }
-      100% { background: var(--color-warning-bg2); }
-    }
+
     summary.ruta-header {
       cursor: pointer;
       display: block;
       padding: 0;
-      font-size: 1.09rem;
+      font-size: 0.93rem;
       font-weight: bold;
       color: #000;
       background: none;
@@ -83,122 +85,141 @@
     summary.ruta-header::-webkit-details-marker { display: none; }
     .resumen-block {
       width: 100%;
-      padding: 22px 20px 15px 20px;
+      padding: 9px 7px 7px 7px;
       font-weight: bold;
       color: #000;
     }
     .resumen-row {
       display: flex;
       align-items: center;
-      gap: 36px;
-      padding: 4px 0;
+      gap: 9px;
+      padding: 2px 0;
       flex-wrap: wrap;
-      font-size: 1.09rem;
+      font-size: 0.90rem;
+      color: #000;
     }
     .resumen-row.resumen-badges {
-      gap: 32px;
-      margin-top: 12px;
-      margin-bottom: 2px;
-      padding: 15px 0 0 0;
-      border-radius: 10px;
+      gap: 9px;
+      margin-top: 3px;
+      margin-bottom: 1px;
+      padding: 5px 0 0 0;
+      border-radius: 7px;
       background: transparent;
     }
-    .resumen-top span { min-width: 170px; }
-    .resumen-label { min-width: 120px; font-size: 1.09rem; margin-right: 6px; display: inline-block;}
+    .resumen-top span { min-width: 80px; }
+    .resumen-label { min-width: 60px; font-size: 0.90rem; margin-right: 6px; display: inline-block; color:#000;}
     .resumen-row .enlace-sheet {
-      font-size: 0.97rem;
-      color: #2266cc;
+      font-size: 0.86rem;
+      color: #233e98;
       font-weight: bold;
       text-decoration: underline;
-      margin-left: 16px;
+      margin-left: 6px;
       display: inline;
     }
-    /* CONTENEDORES DE SECCIÓN */
+    .resumen-row .tiempo-total {
+      font-size: 0.92rem;
+      color: #000;
+      margin-left: 5px;
+      background: #e6fff8;
+      border-radius: 5px;
+      padding: 2px 5px;
+      border: 1px solid #00c78b;
+      font-weight: bold;
+      display: inline-block;
+    }
     .box-carga, .box-nocargados, .box-incompletos {
       background: #fff;
-      border-radius: 10px;
-      padding: 9px 17px;
-      margin-right: 6px;
+      border-radius: 6px;
+      padding: 5px 7px;
+      margin-right: 5px;
       display: inline-block;
-      min-width: 230px;
+      min-width: 70px;
       color: #000;
-      box-shadow: 0 1px 8px #0002;
-      border: 2px solid #e2e2e2;
+      box-shadow: 0 1px 5px #0002;
+      border: 1.5px solid #000;
+      font-weight: bold;
+      font-size:0.89rem;
     }
-    .box-carga       { border-left: 10px solid #36b8fa;}
-    .box-nocargados  { border-left: 10px solid #ff4747;}
-    .box-incompletos { border-left: 10px solid #ffbb01;}
+    .box-carga       { border-left: 7px solid #36b8fa;}
+    .box-nocargados  { border-left: 7px solid #ff4747;}
+    .box-incompletos { border-left: 7px solid #ffbb01;}
     .badges-carga, .badges-estado {
       display: inline-flex;
       flex-wrap: wrap;
-      gap: 9px;
+      gap: 3px;
       align-items: center;
       font-weight: bold;
       vertical-align: middle;
+      color:#000;
     }
     .badge-cant, .badge-status {
       border-radius: 1em;
-      padding: 4px 16px;
+      padding: 2px 7px;
       font-weight: bold;
-      letter-spacing: 0.3px;
-      font-size: 1.01rem;
-      margin-bottom: 2px;
+      letter-spacing: 0.2px;
+      font-size: 0.88rem;
+      margin-bottom: 1px;
       display: inline-block;
-      border-width: 2.2px;
+      border-width: 1.2px;
       border-style: solid;
+      color: #000 !important;
+      background: #fff;
+      box-shadow: 0 1px 2px #0001;
     }
-    .badge-bultos           { background: var(--badge-bultos-bg);        border-color: var(--badge-bultos-b); color: #0b59b5;}
-    .badge-unidades         { background: var(--badge-unidades-bg);      border-color: var(--badge-unidades-b); color: #009245;}
-    .badge-chiclesbultos    { background: var(--badge-chiclesbultos-bg); border-color: var(--badge-chiclesbultos-b); color: #a35c00;}
-    .badge-chiclesunidades  { background: var(--badge-chiclesunidades-bg);border-color: var(--badge-chiclesunidades-b); color: #7304b3;}
-    .badge-status           { border-color: #ff4747; background: #fff3f3; color: #ff4747;}
-    .badge-status.incompleto{ border-color: #ffbb01; background: #fffbe3; color: #ad8400;}
+    .badge-bultos           { background: #35a5ff;        border-color: #003472;}
+    .badge-unidades         { background: #32e772;      border-color: #009245;}
+    .badge-chiclesbultos    { background: #ffb03a; border-color: #ff9800;}
+    .badge-chiclesunidades  { background: #cc8fff; border-color: #7304b3;}
+    .badge-status           { border-color: #ff4747; background: #fff3f3; color: #ff4747 !important;}
+    .badge-status.incompleto{ border-color: #ffbb01; background: #fffbe3; color: #ad8400 !important;}
     @media (max-width: 900px) {
-      .resumen-row { flex-direction: column; gap: 8px; align-items: flex-start; }
-      .resumen-row.resumen-badges { flex-direction: column; gap: 10px; }
+      .resumen-row { flex-direction: column; gap: 5px; align-items: flex-start; }
+      .resumen-row.resumen-badges { flex-direction: column; gap: 6px; }
       .resumen-top span { min-width: 1px; }
-      .box-carga, .box-nocargados, .box-incompletos { min-width: 120px;}
-      .resumen-row .enlace-sheet { margin-left: 0; margin-top: 4px; }
+      .box-carga, .box-nocargados, .box-incompletos { min-width: 55px;}
+      .resumen-row .enlace-sheet { margin-left: 0; margin-top: 3px; }
     }
     .section-content {
-      padding: 24px;
-      border-top: 2px solid #e0e0e0;
-      background: #fafafa;
+      padding: 9px;
+      border-top: 1.2px solid #111;
+      background: #f2f2f2;
       font-weight: bold;
       color: #000;
-      font-size: 0.97rem;
+      font-size: 0.87rem;
     }
     .noenviados-titulo {
-      font-size: 1.07rem;
+      font-size: 0.89rem;
       font-weight: bold;
-      margin: 24px 0 10px;
+      margin: 12px 0 7px;
       color: #000;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 24px;
-      font-size: 0.98rem;
+      margin-bottom: 8px;
+      font-size: 0.87rem;
       font-weight: bold;
       color: #000;
+      background: #fff;
     }
     th, td {
-      padding: 9px;
-      border: 1px solid #bbb;
-      font-size: 0.97rem;
+      padding: 4px;
+      border: 1px solid #111;
+      font-size: 0.87rem;
       text-align: left;
       font-weight: bold;
       color: #000;
+      background: #fff;
     }
     th { background: #e0e0e0; }
     .tabla-cargaincompleta th { background: #fff9c4; }
-    .faltante  { color: #f44336;   font-weight: bold; }
-    .sobrecarga { color: #ffeb3b; font-weight: bold; }
+    .faltante  { color: #e31c1c;   font-weight: bold; }
+    .sobrecarga { color: #f7d900; font-weight: bold; }
     .empty-msg {
-      color: #333;
-      font-size: 0.96rem;
+      color: #222;
+      font-size: 0.87rem;
       font-style: italic;
-      padding: 12px 0;
+      padding: 5px 0;
       text-align: center;
       font-weight: bold;
     }
@@ -209,7 +230,6 @@
   <div id="contenedor-rutas"></div>
   <h2 id="titulo-ayer"></h2>
   <div id="contenedor-ayer"></div>
-
   <script>
     // Fechas
     const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -233,19 +253,20 @@
       `Rutas cargadas hoy ${dias[hoy.getDay()]} ${hoyDisp}`;
     document.getElementById('titulo-ayer').textContent =
       `Rutas cargadas ayer ${dias[ayer.getDay()]} ${ayerDisp}`;
-
-    // Constantes API
     const API_KEY = "AIzaSyCH6an-WnJJ8xYpFSNB7Nj9CFc-JK0Cybo";
     const FOLDER_ID = "1myYCVrhROuDRIxBjBt-5ffENYKMOGXyS";
     const SECCIONES_RESUMEN = ["BULTOS","UNIDADES","CHICLES BULTOS","UNIDADES CHICLES"];
     const RANGE_GENERAL = "A2:D2", RANGE_DETALLE = "A1:K100";
-
-    function getStatusClass(noC, inc) {
-      if (noC > 0) return "error";
-      if (inc > 0) return "warning";
-      return "ok";
+    function formatoMinutosSegundos(mmss) {
+      if (!mmss || typeof mmss !== "string" || !mmss.includes(":")) return "-";
+      const [min, seg] = mmss.split(":").map(x => parseInt(x, 10));
+      if (isNaN(min) || isNaN(seg)) return "-";
+      let partes = [];
+      if (min > 0) partes.push(min === 1 ? "1 minuto" : `${min} minutos`);
+      if (seg > 0) partes.push(seg === 1 ? "1 segundo" : `${seg} segundos`);
+      if (partes.length === 0) return "0 segundos";
+      return partes.join(" ");
     }
-
     function resumenPorSeccionStr(seccionSumas, cargadosPorSec) {
       const colores = {
         "BULTOS":        "badge-cant badge-bultos",
@@ -257,7 +278,7 @@
         .filter(([k, v]) => v > 0)
         .map(([k, v]) => {
           const cargados = cargadosPorSec && cargadosPorSec[k] ? cargadosPorSec[k] : 0;
-          return `<span class="${colores[k]||'badge-cant'}">${v} ${k}<span style="font-size:0.92em;font-weight:normal;"> (CARGADOS: ${cargados})</span></span>`;
+          return `<span class="${colores[k]||'badge-cant'}">${v} ${k}<span style="font-size:0.87em;font-weight:normal;"> (CARGADOS: ${cargados})</span></span>`;
         });
       if (!arr.length) return '';
       return `<span class="badges-carga">${arr.join(' ')}</span>`;
@@ -271,31 +292,30 @@
       if (!badges.length) return '';
       return `<span class="badges-estado">${badges.join(' ')}</span>`;
     }
-
-    // ¡Aquí se incluye el estado visual según status!
-    function resumenVertical(gen, ruta, seccionSumas, cargadosPorSec, noCargadosPorSec, incompletosPorSec, status) {
+    function resumenVertical(gen, ruta, seccionSumas, cargadosPorSec, noCargadosPorSec, incompletosPorSec, status, tiempoTotal) {
       let enlace = "";
       if (ruta && ruta.id) {
         enlace = `<a class="enlace-sheet" href="https://docs.google.com/spreadsheets/d/${ruta.id}" target="_blank" title="Abrir hoja en Google Sheets">
           📄 Ver archivo: ${ruta.name || 'Abrir hoja'}
         </a>`;
       }
-      // TEXTO SEGÚN STATUS
       let estadoTexto = '';
-      if (status === "error") {
-        estadoTexto = `<span style="color:#c00;font-weight:bold;margin-left:16px;">❗ Productos no cargados, revisar</span>`;
+      if (status === "morado") {
+        estadoTexto = `<span style="color:#000;font-weight:bold;margin-left:10px;">🟣 Productos no cargados <b>y</b> pendientes</span>`;
+      } else if (status === "error") {
+        estadoTexto = `<span style="color:#000;font-weight:bold;margin-left:10px;">❗ Productos no cargados, revisar</span>`;
       } else if (status === "warning") {
-        estadoTexto = `<span style="color:#b68900;font-weight:bold;margin-left:16px;">⚠️ Carga incompleta, revisar</span>`;
+        estadoTexto = `<span style="color:#000;font-weight:bold;margin-left:10px;">⚠️ Pendientes o carga incompleta</span>`;
       } else {
-        estadoTexto = `<span style="color:#0b9232;font-weight:bold;margin-left:16px;">✅ Carga completa</span>`;
+        estadoTexto = `<span style="color:#000;font-weight:bold;margin-left:10px;">✅ Carga completa</span>`;
       }
-
       return `
       <div class="resumen-block">
         <div class="resumen-row resumen-top">
           <span><b>Ruta:</b> ${gen[0]}</span>
           <span><b>Patente:</b> ${gen[1]}</span>
           <span><b>Usuario:</b> ${gen[3]}</span>
+          <span class="tiempo-total"><b>Tiempo Total:</b> ${formatoMinutosSegundos(tiempoTotal)}</span>
           ${enlace}
           ${estadoTexto}
         </div>
@@ -309,20 +329,18 @@
             ${badgesEstadoPorSeccion(noCargadosPorSec, '', 'NO CARGADOS')}
           </div>` : ''}
           ${Object.values(incompletosPorSec).some(v=>v>0) ? `<div class="box-incompletos">
-            <span class="resumen-label">INCOMPLETOS:</span>
-            ${badgesEstadoPorSeccion(incompletosPorSec, 'incompleto', 'INCOMPLETOS')}
+            <span class="resumen-label">INCOMPLETOS / PENDIENTES:</span>
+            ${badgesEstadoPorSeccion(incompletosPorSec, 'incompleto', 'INCOMPLETOS o PENDIENTES')}
           </div>` : ''}
         </div>
       </div>
       `;
     }
-
     async function procesarFecha(fechaSheet, contId, msg) {
       const cont = document.getElementById(contId);
       cont.innerHTML = `<div class="empty-msg">Cargando…</div>`;
       const rutas = await fetchDriveSheets(fechaSheet);
       const bloques = [];
-      const clasesPendientes = [];
       for (const ruta of rutas) {
         let gen = [];
         for (const sec of SECCIONES_RESUMEN) {
@@ -330,6 +348,13 @@
           if (v.length && v[0].length >= 4) { gen = v[0]; break; }
         }
         while (gen.length < 4) gen.push('-');
+        let tiempoTotal = '-';
+        try {
+          const tiemposData = await fetchSheetData(ruta.id, "TIEMPOS", "A2:E2");
+          if (tiemposData.length && tiemposData[0].length >= 5) {
+            tiempoTotal = tiemposData[0][4] || '-';
+          }
+        } catch (e) {}
         let total = 0;
         const skusSet = new Set();
         const incs = [];
@@ -338,6 +363,8 @@
         let cargadosPorSec = {};
         let noCargadosPorSec = {};
         let incompletosPorSec = {};
+        let hayNoCargado = false;
+        let hayPendienteOParcial = false;
         for (const sec of SECCIONES_RESUMEN) {
           seccionSumas[sec] = 0;
           cargadosPorSec[sec] = 0;
@@ -349,49 +376,57 @@
             data.slice(1).forEach(row => {
               const code = row[4]?.trim();
               const valorG = row[6];
-              const carg = row[7], cargado = row[8];
-              // Suma de "a cargar" (columna G)
+              const carg = row[7];
+              const cargado = (row[8]||'').toString().trim().toUpperCase();
               if (valorG !== undefined && valorG !== null && valorG !== '' && !isNaN(parseFloat(valorG))) {
                 seccionSumas[sec] += parseFloat(valorG);
               }
-              // Suma de "cargados" (columna H)
               if (carg !== undefined && carg !== null && carg !== '' && !isNaN(parseFloat(carg))) {
                 cargadosPorSec[sec] += parseFloat(carg);
               }
-              // AJUSTE: Para "no cargados", sumar la cantidad de "por cargar"
-              if (String(cargado).toUpperCase() === 'NO') {
+              if (cargado === "NO CARGADO") {
+                hayNoCargado = true;
                 nos.push({ hoja: sec, fila: row });
                 if (!isNaN(parseFloat(valorG))) {
                   noCargadosPorSec[sec] += parseFloat(valorG);
                 }
               }
-              // AJUSTE: Para "incompletos", sumar la diferencia de lo que falta/sobra
-              if (carg !== '' && valorG !== '' && carg != valorG) {
+              if (cargado === "PENDIENTE" || (
+                cargado !== "NO CARGADO" &&
+                valorG !== undefined && carg !== undefined &&
+                valorG !== '' && carg !== '' &&
+                parseFloat(valorG) !== parseFloat(carg)
+              )) {
+                hayPendienteOParcial = true;
                 incs.push({ hoja: sec, fila: row });
                 if (!isNaN(parseFloat(valorG)) && !isNaN(parseFloat(carg))) {
                   incompletosPorSec[sec] += Math.abs(parseFloat(valorG) - parseFloat(carg));
+                } else if (!isNaN(parseFloat(valorG))) {
+                  incompletosPorSec[sec] += parseFloat(valorG);
                 }
               }
               if (code && (valorG || carg)) skusSet.add(code);
             });
           }
         }
-        const status = getStatusClass(nos.length, incs.length);
-        // LLAMA con status
-        const resumenHtml = resumenVertical(gen, ruta, seccionSumas, cargadosPorSec, noCargadosPorSec, incompletosPorSec, status);
-        // SOLO clase pendiente por ahora:
+        let status = "ok";
+        if (hayNoCargado && hayPendienteOParcial) status = "morado";
+        else if (hayNoCargado) status = "error";
+        else if (hayPendienteOParcial) status = "warning";
+        else status = "ok";
+        const resumenHtml = resumenVertical(gen, ruta, seccionSumas, cargadosPorSec, noCargadosPorSec, incompletosPorSec, status, tiempoTotal);
         bloques.push({
           status,
           html: `
-            <details class="ruta-bloque bloque-pendiente">
-              <summary class="ruta-header ${status}">
+            <details class="ruta-bloque ${status}">
+              <summary class="ruta-header">
                 ${resumenHtml}
               </summary>
               <div class="section-content">
-                <div class="noenviados-titulo">Detalle productos con carga incompleta</div>
+                <div class="noenviados-titulo">Detalle productos con carga incompleta o pendientes</div>
                 ${incs.length
                   ? `<table class="tabla-cargaincompleta">
-                       <tr><th>Sección</th><th>Código</th><th>Nombre</th><th>Por cargar</th><th>Cargados</th><th>Tipo</th></tr>
+                       <tr><th>Sección</th><th>Código</th><th>Nombre</th><th>Por cargar</th><th>Cargados</th><th>Cargado</th><th>Tipo</th></tr>
                        ${incs.map(o => `
                          <tr>
                            <td>${o.hoja}</td>
@@ -399,19 +434,23 @@
                            <td>${o.fila[5]||'-'}</td>
                            <td>${o.fila[6]||'-'}</td>
                            <td>${o.fila[7]||'-'}</td>
+                           <td>${o.fila[8]||'-'}</td>
                            <td>${
-                             (!isNaN(+o.fila[7]) && !isNaN(+o.fila[6]))
-                               ? (+o.fila[7] > +o.fila[6]
-                                   ? '<span class="sobrecarga">Sobrecarga</span>'
-                                   : (+o.fila[7] < +o.fila[6]
-                                       ? '<span class="faltante">Faltante</span>'
-                                       : ''))
-                               : ''
+                             (String(o.fila[8]||'').trim().toUpperCase() === "PENDIENTE")
+                               ? '<span class="faltante">Pendiente</span>'
+                               : (
+                                  (!isNaN(+o.fila[7]) && !isNaN(+o.fila[6]))
+                                    ? (+o.fila[7] > +o.fila[6]
+                                        ? '<span class="sobrecarga">Sobrecarga</span>'
+                                        : (+o.fila[7] < +o.fila[6]
+                                            ? '<span class="faltante">Faltante</span>'
+                                            : ''))
+                                    : ''
+                                 )
                            }</td>
                          </tr>`).join('')}
                      </table>`
-                  : `<div class="empty-msg">No hay productos con carga incompleta.</div>`}
-
+                  : `<div class="empty-msg">No hay productos con carga incompleta ni pendientes.</div>`}
                 <div class="noenviados-titulo">Detalle productos NO cargados</div>
                 ${nos.length
                   ? `<table>
@@ -432,25 +471,14 @@
               </div>
             </details>`
         });
-        clasesPendientes.push(status); // Guardamos la clase que le corresponde
       }
-      // Pinta todo sin color ni animación todavía
       if (!bloques.length) {
         cont.innerHTML = `<div class="empty-msg">${msg} (${fechaSheet}).</div>`;
       } else {
-        bloques.sort((a,b)=>{ const o={error:0,warning:1,ok:2}; return o[a.status]-o[b.status]; });
+        const orden = {morado:0, error:1, warning:2, ok:3};
+        bloques.sort((a,b)=> orden[a.status]-orden[b.status]);
         cont.innerHTML = bloques.map(b=>b.html).join('');
       }
-      // Espera 5 segundos, luego aplica las clases de color/animación a todos juntos
-      setTimeout(() => {
-        document.querySelectorAll(`#${contId} .bloque-pendiente`).forEach((el, i) => {
-          el.classList.remove('bloque-pendiente');
-          el.classList.add(
-            clasesPendientes[i] === "error" ? "bloque-error" :
-            clasesPendientes[i] === "warning" ? "bloque-warning" : "bloque-ok"
-          );
-        });
-      }, 5000); // 5 segundos
     }
     async function fetchDriveSheets(datePrefix = '') {
       const conditions = [`'${FOLDER_ID}' in parents`, `mimeType='application/vnd.google-apps.spreadsheet'`];
@@ -472,7 +500,6 @@
         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}!${range}?key=${API_KEY}`;
       const resp = await fetch(url);
       if (!resp.ok) {
-        console.error(`Error al obtener datos de "${sheetName}" (${resp.status}): ${resp.statusText}`);
         return [];
       }
       return (await resp.json()).values || [];
