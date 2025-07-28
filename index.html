@@ -140,6 +140,7 @@
         <button class="inicio-btn" onclick="iniciarModo(0)">Ver Producto con Fecha Corta</button>
         <button class="inicio-btn" onclick="iniciarModo(1)">Ver estado de flota</button>
         <button class="inicio-btn" onclick="iniciarModo(2)">Ver estado de despachos</button>
+        <button class="inicio-btn" onclick="iniciarModo(3)">Ver Quiebres de Stock</button>
         <button class="inicio-btn" onclick="iniciarModo('auto')">Ver en TV</button>
       </div>
     </div>
@@ -161,7 +162,8 @@
     const paginas = [
       { archivo: 'fechas.html', tiempo: 180000 },   // 3 minutos
       { archivo: 'flota.html',  tiempo: 120000 },   // 2 minutos
-      { archivo: 'despacho.html', tiempo: 300000 }  // 5 minutos
+      { archivo: 'despacho.html', tiempo: 300000 }, // 5 minutos
+      { archivo: 'quiebres.html', tiempo: 180000 }  // 3 minutos
     ];
     let actual = 0;
     let timer = null;
@@ -193,23 +195,19 @@
       }
     }
 
-    // Flecha para ir a la siguiente (manual o auto según modo)
-    document.getElementById('switchArrow').onclick = function() {
-      if (automatico) {
-        mostrarPagina((actual + 1) % paginas.length, true);
-      } else {
-        mostrarPagina((actual + 1) % paginas.length, false);
-      }
-    };
-
-    // Botón de volver al inicio
+    // Botón Home
     document.getElementById('homeArrow').onclick = function() {
       if (timer) clearTimeout(timer);
-      document.getElementById('inicioPanel').classList.remove('oculto');
       document.getElementById('main-frame').classList.add('oculto');
+      document.getElementById('inicioPanel').classList.remove('oculto');
       document.getElementById('topRightBtns').classList.add('oculto');
-      document.getElementById('main-frame').src = "";
       automatico = false;
+    };
+
+    // Botón Siguiente
+    document.getElementById('switchArrow').onclick = function() {
+      let next = (actual + 1) % paginas.length;
+      mostrarPagina(next, automatico);
     };
   </script>
 </body>
