@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Carrusel Inventario Críticos por Familia</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4fa;
+      margin: 0; padding: 0; color: #222;
+    }
+    .carrusel-contenedor {
+      width: 98vw;
+      max-width: 1920px;
+      min-width: 480px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px #0001;
+      padding: 0 0 10px 0;
+      min-height: 530px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: start;
+      position: relative;
+      margin-top: 12px;
+    }
+    .carrusel-barra-progreso {
+      width: 100%;
+      height: 13px;
+      background: #f2f2f5;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      font-size: 0.98em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .carrusel-barra-interna {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9800, #1976D2 60%, #8E24AA 100%);
+      position: absolute; left: 0; top: 0; z-index: 0;
+      transition: width 0.5s;
+      opacity: 0.23;
+    }
+    .carrusel-barra-texto {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      text-align: center;
+      color: #222;
+      font-weight: 500;
+      user-select: none;
+      font-size: 1em;
+      letter-spacing: 0.03em;
+    }
+    .carrusel-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 8px 12px 3px 12px;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+    .familia-badge {
+      font-size: 2.7em;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      border-radius: 14px;
+      padding: 8px 48px;
+      margin-bottom: 10px;
+      color: #222;
+      text-align: center;
+      border: none;
+      box-shadow: 0 1px 7px #0001;
+      display: inline-block;
+      min-width: 180px;
+    }
+    .ALIMENTOS   .familia-badge { background: #FF9800; color: #222;}
+    .CARAMELOS   .familia-badge { background: #1976D2; color: #fff;}
+    .CHICLES     .familia-badge { background: #2ECC40; color: #222;}
+    .CHOCOLATES  .familia-badge { background: #7B3F00; color: #fff;}
+    .HARINAS     .familia-badge { background: #FFD600; color: #222;}
+    .SEASONAL    .familia-badge { background: #8E24AA; color: #fff;}
+    .carrusel-info-badges {
+      display: flex; gap: 13px; align-items: center;
+      font-size: 1em; flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 5px;
+    }
+    .carrusel-info-badges span {
+      background: #f6f8fc;
+      color: #333;
+      border-radius: 15px;
+      padding: 4px 17px;
+      font-weight: 600;
+      border: 1.1px solid #eee;
+      font-size: 0.98em;
+      box-shadow: 0 1px 2px #0001;
+      margin-bottom: 1px;
+    }
+    .criticos-badge {
+      color: #b11212 !important;
+      background: #ffe0e3 !important;
+      border: 1.1px solid #f69393 !important;
+      font-weight: 800 !important;
+    }
+    .min-badge {
+      background: #e9fbe7 !important;
+      color: #1f780a !important;
+      border-color: #95e4a7 !important;
+      font-weight: 700;
+    }
+    .familia-tabla {
+      margin: 3px auto 0 auto;
+      width: 99.6%;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: none;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .tabla-doble-col {
+      width: 100%;
+      display: flex;
+      gap: 2vw;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .tabla-doble-col table {
+      width: 48%;
+      min-width: 350px;
+      max-width: 700px;
+      font-size: 1em;
+      margin-bottom: 0;
+      margin-top: 0;
+      background: #fff;
+    }
+    .tabla-doble-col th, .tabla-doble-col td {
+      padding: 5px 9px;
+      font-size: 0.97em;
+    }
+    .familia-subtabla {
+      margin-top: 7px;
+      width: 100%;
+      background: #fafaff;
+      border-radius: 7px;
+      padding: 0;
+      box-shadow: none;
+      overflow: auto;
+    }
+    .toggle-btn {
+      margin: 9px 0 0 0;
+      background: #f6f8fc;
+      border: 1px solid #bbb;
+      border-radius: 7px;
+      color: #1976D2;
+      font-size: 0.95em;
+      font-weight: 500;
+      padding: 4px 14px;
+      cursor: pointer;
+      transition: background 0.13s, border 0.13s;
+      outline: none;
+      display: block;
+    }
+    .toggle-btn:hover {
+      background: #e6f0ff;
+      border-color: #2196f3;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      border-radius: 7px;
+      overflow: hidden;
+      color: #222;
+      font-size: 0.92em;
+      min-width: 320px;
+    }
+    th, td {
+      padding: 4px 8px;
+      border: 1px solid #e3e4e9;
+      text-align: left;
+      color: #222;
+      background: #fff;
+      font-size: 1em;
+      vertical-align: middle;
+    }
+    th {
+      background: #f3f4fc;
+      color: #222;
+      font-weight: 700;
+      font-size: 1em;
+      border-bottom: 2px solid #dbe0ec;
+    }
+    tr:hover:not(.bajo-umbral) { background: #eaf4ff; }
+    .bajo-umbral {
+      background: #fff0ec !important;
+      color: #b11212 !important;
+      font-weight: bold;
+      animation: parpadeoCritico 1.4s linear infinite alternate;
+    }
+    .bajo-umbral td { color: #b11212 !important; font-weight: 600; }
+    .alerta-icono {
+      color: #ff9900;
+      font-size: 1.04em;
+      margin-right: 3px;
+      vertical-align: middle;
+    }
+    @keyframes parpadeoCritico {
+      0% { box-shadow: 0 0 0 0 #ffb68b22; }
+      100% { box-shadow: 0 0 14px 2px #e6383880; }
+    }
+    .carrusel-footer {
+      text-align: right;
+      margin: 5px 33px 0 0;
+      color: #888;
+      font-size: 0.98em;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+    .flechas-carrusel {
+      position: absolute;
+      top: 46%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .flecha {
+      background: #fff;
+      color: #444;
+      border-radius: 70px;
+      border: 1.5px solid #bbb;
+      font-size: 2.2em;
+      box-shadow: 0 2px 10px #0002;
+      width: 38px; height: 38px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.13s;
+    }
+    .flecha:hover { background: #fcfcfc; color: #111;}
+    @media (max-width: 1200px) {
+      .tabla-doble-col { flex-direction: column; }
+      .tabla-doble-col table { width: 99%; min-width: 0; max-width: 100%; }
+      .familia-badge { font-size: 1.5em; }
+    }
+    @media (max-width: 900px) {
+      .carrusel-contenedor { min-width: 97vw; padding: 0; }
+      .familia-badge { font-size: 1.1em; padding: 6px 6px;}
+      .carrusel-header { gap: 6px; }
+      .carrusel-info-badges span { padding: 2px 7px; font-size: 0.92em;}
+      table, th, td { font-size: 0.85em;}
+      .familia-tabla { width: 98vw;}
+    }
+    @media (max-width: 600px) {
+      .carrusel-barra-progreso { font-size: 0.93em;}
+      .carrusel-footer { font-size: 0.92em; margin-right: 2vw;}
+      .familia-tabla { font-size: 0.86em;}
+    }
+  </style>
+</head>
+<body>
+  <div class="carrusel-contenedor" id="carrusel-contenedor">
+    <div class="carrusel-barra-progreso">
+      <div class="carrusel-barra-interna" id="barraProgreso"></div>
+      <div class="carrusel-barra-texto" id="barraTexto"></div>
+    </div>
+    <div class="carrusel-header" id="carrusel-header"></div>
+    <div class="familia-tabla" id="familia-tabla"></div>
+    <div class="carrusel-footer" id="carrusel-footer"></div>
+    <div class="flechas-carrusel">
+      <button class="flecha" id="prevBtn" title="Anterior">&#8592;</button>
+      <button class="flecha" id="nextBtn" title="Siguiente">&#8594;</button>
+    </div>
+  </div>
+  <script>
+    const sheetId = '1wfg6CTce7TjFdPaRyZtqcUvQOs0NtRNqqKMClItG3Qs';
+    const sheetName = 'DINAMICA';
+    const apiKey = 'AIzaSyDO2h32WFBS14et91dWgWTzXxFlLw6wlCY';
+    const range = 'A1:D1000';
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}!${range}?key=${apiKey}`;
+    const umbrales = {
+      "ALIMENTOS": 20,
+      "CARAMELOS": 20,
+      "CHICLES": 30,
+      "CHOCOLATES": 50,
+      "HARINAS": 100,
+      "SEASONAL": 10
+    };
+    const ordenFamilias = [
+      "ALIMENTOS", "CARAMELOS", "CHICLES", "CHOCOLATES", "HARINAS", "SEASONAL"
+    ];
+    let familias = {};
+    let currentIdx = 0;
+    let timer = null;
+    let intervalSegundos = 30;
+    let segundosRestantes = intervalSegundos;
+
+    function mostrarFamilia(idx) {
+      const fam = ordenFamilias[idx];
+      if (!familias[fam]) return;
+      document.body.className = fam;
+      const total = ordenFamilias.length;
+      const texto = `Familia ${idx + 1} de ${total} | Siguiente en <b><span id="segundos">${segundosRestantes}</span>s</b>`;
+      document.getElementById('barraTexto').innerHTML = texto;
+      const ancho = ((intervalSegundos - segundosRestantes) / intervalSegundos) * 100;
+      document.getElementById('barraProgreso').style.width = `${ancho}%`;
+
+      // Header
+      let criticos = 0;
+      const umbral = umbrales[fam];
+      const codigosUnicos = new Set(familias[fam].map(f => f[0])).size;
+      let criticosArr = [];
+      let noCriticosArr = [];
+      familias[fam].forEach(fila => {
+        let bultos = parseFloat((fila[1] || '').toString().replace(',', '.'));
+        if (!isNaN(bultos) && umbral && bultos < umbral) {
+          criticos++;
+          criticosArr.push(fila);
+        } else {
+          noCriticosArr.push(fila);
+        }
+      });
+      criticosArr.sort((a, b) => (parseFloat(a[1])||0) - (parseFloat(b[1])||0));
+      noCriticosArr.sort((a, b) => (parseFloat(a[1])||0) - (parseFloat(b[1])||0));
+
+      document.getElementById('carrusel-header').innerHTML = `
+        <span class="familia-badge ${fam}">${fam}</span>
+        <div class="carrusel-info-badges">
+          <span>SKU únicos: ${codigosUnicos}</span>
+          <span class="${criticos > 0 ? 'criticos-badge' : ''}">Críticos: ${criticos}</span>
+          <span class="min-badge">Mínimo: ${umbral}</span>
+        </div>
+      `;
+
+      // Tabla doble columna: SOLO críticos, ORDENADO
+      let tabla = "";
+      if (criticosArr.length === 0) {
+        tabla += `<table><tr><td colspan="3" style="text-align:center; color:#6d6d6d; font-size:1.02em; padding:15px;">✅ Sin productos críticos</td></tr></table>`;
+      } else {
+        let mitad = Math.ceil(criticosArr.length / 2);
+        let col1 = criticosArr.slice(0, mitad);
+        let col2 = criticosArr.slice(mitad);
+        tabla += `<div class="tabla-doble-col">
+          <table>
+            <tr>
+              <th>Código</th>
+              <th>Bultos</th>
+              <th>Nombre de producto</th>
+            </tr>
+            ${col1.map(fila =>
+              `<tr class="bajo-umbral">
+                <td style="font-weight:bold;color:#b11212;">${fila[0]}</td>
+                <td><span class="alerta-icono">⚠️</span>${fila[1]}</td>
+                <td style="font-weight:bold;color:#b11212;">${fila[2]}</td>
+              </tr>`
+            ).join('')}
+          </table>
+          <table>
+            <tr>
+              <th>Código</th>
+              <th>Bultos</th>
+              <th>Nombre de producto</th>
+            </tr>
+            ${col2.map(fila =>
+              `<tr class="bajo-umbral">
+                <td style="font-weight:bold;color:#b11212;">${fila[0]}</td>
+                <td><span class="alerta-icono">⚠️</span>${fila[1]}</td>
+                <td style="font-weight:bold;color:#b11212;">${fila[2]}</td>
+              </tr>`
+            ).join('')}
+          </table>
+        </div>`;
+      }
+
+      // Subtabla desplegable de no críticos
+      let subtabla = "";
+      if (noCriticosArr.length > 0) {
+        subtabla = `
+          <button class="toggle-btn" onclick="toggleSubtabla()">Ver productos no críticos (${noCriticosArr.length})</button>
+          <div class="familia-subtabla" id="subtabla-no-criticos" style="display:none;">
+            <table>
+              <tr>
+                <th>Código</th>
+                <th>Bultos</th>
+                <th>Nombre de producto</th>
+              </tr>
+              ${noCriticosArr.map(fila =>
+                `<tr>
+                  <td>${fila[0]}</td>
+                  <td>${fila[1]}</td>
+                  <td>${fila[2]}</td>
+                </tr>`
+              ).join('')}
+            </table>
+          </div>
+        `;
+      }
+
+      document.getElementById('familia-tabla').innerHTML = tabla + subtabla;
+
+      document.getElementById('carrusel-footer').innerHTML =
+        `Mostrando familia ${idx + 1} de ${ordenFamilias.length}`;
+    }
+
+    window.toggleSubtabla = function() {
+      const sub = document.getElementById('subtabla-no-criticos');
+      if (sub.style.display === "none") {
+        sub.style.display = "block";
+      } else {
+        sub.style.display = "none";
+      }
+    }
+
+    function startCarrusel() {
+      if (timer) clearInterval(timer);
+      segundosRestantes = intervalSegundos;
+      mostrarFamilia(currentIdx);
+      timer = setInterval(() => {
+        segundosRestantes--;
+        document.getElementById('segundos').textContent = segundosRestantes;
+        const ancho = ((intervalSegundos - segundosRestantes) / intervalSegundos) * 100;
+        document.getElementById('barraProgreso').style.width = `${ancho}%`;
+        if (segundosRestantes <= 0) {
+          currentIdx = (currentIdx + 1) % ordenFamilias.length;
+          segundosRestantes = intervalSegundos;
+          mostrarFamilia(currentIdx);
+        }
+      }, 1000);
+    }
+
+    document.getElementById('nextBtn').onclick = function() {
+      currentIdx = (currentIdx + 1) % ordenFamilias.length;
+      segundosRestantes = intervalSegundos;
+      startCarrusel();
+    }
+    document.getElementById('prevBtn').onclick = function() {
+      currentIdx = (currentIdx - 1 + ordenFamilias.length) % ordenFamilias.length;
+      segundosRestantes = intervalSegundos;
+      startCarrusel();
+    }
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.values) {
+          document.getElementById('carrusel-header').innerHTML = 'No se pudieron leer los datos.<br>' + (data.error ? data.error.message : '');
+          return;
+        }
+        const values = data.values;
+        familias = {};
+        for (let i = 1; i < values.length; i++) {
+          const c = (values[i][2] || '').toString().trim().toUpperCase();
+          const d = (values[i][3] || '').toString().trim().toUpperCase();
+          if (c === 'SIN DATOS' || d === 'SIN DATOS') continue;
+          const familia = values[i][3] || 'Sin familia';
+          if (!familias[familia]) familias[familia] = [];
+          familias[familia].push([
+            values[i][0] || '', // código
+            values[i][1] || '', // bultos
+            values[i][2] || ''  // nombre
+          ]);
+        }
+        startCarrusel();
+      })
+      .catch(error => {
+        document.getElementById('carrusel-header').innerHTML = 'Error al leer los datos.';
+        console.error(error);
+      });
+  </script>
+</body>
+</html>
