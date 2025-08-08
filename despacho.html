@@ -112,7 +112,7 @@
 
     /************* Drive + Sheets *************/
     async function fetchDriveSheets(datePrefix='') {
-      const cacheKey = `v2:driveList:${FOLDER_ID}:${datePrefix}`; // v2 => limpia cachés viejos
+      const cacheKey = `v2:driveList:${FOLDER_ID}:${datePrefix}`;
       const cached = cacheGet(cacheKey);
       if (cached) return cached;
 
@@ -121,7 +121,6 @@
         `mimeType='application/vnd.google-apps.spreadsheet'`,
         `trashed = false`
       ];
-      // mantenemos contains para acotar, pero haremos filtro estricto luego
       if (datePrefix) conditions.push(`name contains '${datePrefix}'`);
       const q = conditions.join(' and ');
       const url =
@@ -161,7 +160,9 @@
       const out = {};
       if (data && data.valueRanges) {
         for (const vr of data.valueRanges) {
-          const [name, r] = vr.range.split("!");
+          const [rawName, r] = vr.range.split("!");
+          // *** Arreglo: quitar comillas simples que pone la API cuando hay espacios en el nombre de la hoja ***
+          const name = rawName.replace(/^'/, "").replace(/'$/, "");
           out[`${name}|${r}`] = vr.values || [];
         }
       }
@@ -177,11 +178,17 @@
     }
 
     function resumenPorSeccionStr(seccionSumas, cargadosPorSec) {
-      const cls = "badge-cant badge-bultos";
+      const m = {
+        "BULTOS":"badge-bultos",
+        "UNIDADES":"badge-unidades",
+        "CHICLES BULTOS":"badge-chiclesbultos",
+        "UNIDADES CHICLES":"badge-chiclesunidades"
+      };
       const arr = Object.entries(seccionSumas)
         .filter(([,v]) => v > 0)
         .map(([k, v]) => {
           const cargados = cargadosPorSec?.[k] || 0;
+          const cls = `badge-cant ${m[k] || 'badge-bultos'}`;
           return `<span class="${cls}">${v} ${k}<span style="font-size:.87em;font-weight:normal;"> (CARGADOS: ${cargados})</span></span>`;
         });
       return arr.length ? `<span class="badges-carga">${arr.join(' ')}</span>` : '';
@@ -234,7 +241,7 @@
       }
 
       const bloques = [];
-      await mapLimit(rutas, 3, async (ruta) => { // throttle: 3 en paralelo
+      await mapLimit(rutas, 3, async (ruta) => {
         const batch = await fetchSheetDataBatch(ruta.id);
 
         // General: tomo el primero que tenga datos
