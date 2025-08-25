@@ -138,7 +138,6 @@
       <div class="subtitulo">¿Qué quieres revisar?</div>
       <div class="inicio-botones">
         <button class="inicio-btn" onclick="iniciarModo(0)">Ver Producto con Fecha Corta</button>
-        <button class="inicio-btn" onclick="iniciarModo(1)">Ver estado de flota</button>
         <button class="inicio-btn" onclick="iniciarModo(2)">Ver estado de despachos</button>
         <button class="inicio-btn" onclick="iniciarModo(3)">Ver Quiebres de Stock</button>
         <button class="inicio-btn" onclick="iniciarModo('auto')">Ver en TV</button>
@@ -161,7 +160,6 @@
     // Paginas y sus tiempos en milisegundos: [archivo, duración]
     const paginas = [
       { archivo: 'fechas.html', tiempo: 180000 },   // 3 minutos
-      { archivo: 'flota.html',  tiempo: 120000 },   // 2 minutos
       { archivo: 'despacho.html', tiempo: 300000 }, // 5 minutos
       { archivo: 'quiebres.html', tiempo: 180000 }  // 3 minutos
     ];
