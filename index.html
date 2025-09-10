@@ -2,211 +2,104 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>CONTROL COMERCIAL HAMBURGO LIMITADA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rotación de Páginas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
       height: 100%;
       margin: 0;
-      background: #f7f8fd;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #000;
       overflow: hidden;
     }
-    .inicio-panel {
-      position: fixed;
-      inset: 0;
-      background: #f7f8fd;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-    .panel-container {
-      background: #fff;
-      border-radius: 28px;
-      box-shadow: 0 8px 44px #2335c113, 0 1px 10px #354bb219;
-      padding: 50px 38px 42px 38px;
-      min-width: 360px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .titulo {
-      font-size: 2.8rem;
-      font-weight: 900;
-      color: #253090;
-      letter-spacing: 1px;
-      margin-bottom: 13px;
-      text-shadow: 0 4px 20px #2230711a;
-      text-align: center;
-    }
-    .subtitulo {
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: #354bb2;
-      margin-bottom: 40px;
-      margin-top: 5px;
-      letter-spacing: 0.5px;
-      text-align: center;
-    }
-    .inicio-botones {
-      display: flex;
-      gap: 32px;
-      margin-top: 0;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-    }
-    .inicio-btn {
-      background: #354bb2;
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 28px 38px;
-      font-size: 1.21rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 14px #354bb228;
-      transition: background 0.19s, transform 0.14s, box-shadow 0.19s;
-      outline: none;
-      margin: 0 7px 18px 7px;
-      min-width: 215px;
-      letter-spacing: 0.3px;
-      border-bottom: 4px solid #25309055;
-      border-top: 2.3px solid #fff;
-    }
-    .inicio-btn:hover, .inicio-btn:focus {
-      background: #222c8c;
-      transform: scale(1.06) translateY(-2px);
-      box-shadow: 0 4px 25px #222c8c32;
-    }
-    .btn-group-topright {
-      position: fixed;
-      top: 18px;
-      right: 26px;
-      z-index: 99;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-    .switch-arrow, .home-arrow {
-      background: #354bb2;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 2em;
-      box-shadow: 0 3px 16px #0003;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.93;
-      transition: background 0.2s, opacity 0.17s;
-    }
-    .switch-arrow:hover, .home-arrow:hover {
-      background: #222c8c;
-      opacity: 1;
-    }
-    #main-frame {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-      background: #e9ecf8;
-    }
-    .oculto { display: none !important; }
 
-    @media (max-width: 600px) {
-      .panel-container { padding: 18px 4px 12px 4px; min-width: 0; border-radius: 0; }
-      .titulo { font-size: 1.35rem; }
-      .subtitulo { font-size: 1.02rem; margin-bottom: 23px; }
-      .inicio-botones { flex-direction: column; gap: 18px; }
-      .inicio-btn { font-size: 0.99rem; padding: 14px 6px; min-width: 110px;}
-      .btn-group-topright { top: 8px; right: 8px; gap: 7px;}
-      .switch-arrow, .home-arrow { width: 40px; height: 40px; font-size: 1.3em;}
+    #page-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #countdown {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #0f0;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      font-family: monospace;
+      border-radius: 6px;
+      z-index: 100;
     }
   </style>
 </head>
 <body>
-  <!-- Pantalla de inicio -->
-  <div class="inicio-panel" id="inicioPanel">
-    <div class="panel-container">
-      <div class="titulo">CONTROL COMERCIAL HAMBURGO LIMITADA</div>
-      <div class="subtitulo">¿Qué quieres revisar?</div>
-      <div class="inicio-botones">
-        <button class="inicio-btn" onclick="iniciarModo(0)">Ver Producto con Fecha Corta</button>
-        <button class="inicio-btn" onclick="iniciarModo(2)">Ver estado de despachos</button>
-        <button class="inicio-btn" onclick="iniciarModo(3)">Ver Quiebres de Stock</button>
-        <button class="inicio-btn" onclick="iniciarModo('auto')">Ver en TV</button>
-      </div>
-    </div>
-  </div>
-  <!-- Flecha y Home en la esquina superior derecha -->
-  <div class="btn-group-topright oculto" id="topRightBtns">
-    <button class="home-arrow" id="homeArrow" title="Volver al inicio" aria-label="Inicio">
-      <svg width="27" height="27" viewBox="0 0 27 27" style="display:block;margin:auto;" fill="none">
-        <path d="M4 11.5L13.5 4L23 11.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M6.5 10.5V22H20.5V10.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
-    <button class="switch-arrow" id="switchArrow" title="Siguiente página">&#8594;</button>
-  </div>
-  <!-- Iframe oculto hasta que el usuario elija -->
-  <iframe id="main-frame" src="" class="oculto"></iframe>
+  <iframe id="page-frame"></iframe>
+  <div id="countdown">Cargando...</div>
+
   <script>
-    // Paginas y sus tiempos en milisegundos: [archivo, duración]
-    const paginas = [
-      { archivo: 'fechas.html', tiempo: 180000 },   // 3 minutos
-      { archivo: 'despacho.html', tiempo: 300000 }, // 5 minutos
-      { archivo: 'quiebres.html', tiempo: 180000 }  // 3 minutos
-    ];
-    let actual = 0;
-    let timer = null;
-    let automatico = false;
+    const pages = ['actual.html', 'tabla.html', 'anterior.html'];
+    const durations = [null, 60000, 60000]; // null = espera mensaje
 
-    function iniciarModo(opcion) {
-      document.getElementById('inicioPanel').classList.add('oculto');
-      document.getElementById('main-frame').classList.remove('oculto');
-      document.getElementById('topRightBtns').classList.remove('oculto');
+    let index = 0;
+    let timeoutId;
+    let countdownInterval;
+    const frame = document.getElementById('page-frame');
+    const countdownEl = document.getElementById('countdown');
 
-      if (opcion === 'auto') {
-        automatico = true;
-        mostrarPagina(0, true);
+    function showPage(i) {
+      frame.src = pages[i];
+
+      if (durations[i]) {
+        countdownEl.style.display = 'block';
+        startCountdown(durations[i]);
       } else {
-        automatico = false;
-        mostrarPagina(opcion, false);
+        countdownEl.style.display = 'block';
+        countdownEl.textContent = 'Mostrando datos actuales';
+        clearInterval(countdownInterval);
       }
     }
 
-    function mostrarPagina(idx, auto = false) {
-      actual = idx;
-      document.getElementById('main-frame').src = paginas[idx].archivo;
+    function startCountdown(duration) {
+      let remaining = duration / 1000;
+      countdownEl.textContent = `Siguiente en: ${remaining} s`;
 
-      if (timer) clearTimeout(timer);
-      if (auto) {
-        timer = setTimeout(() => {
-          mostrarPagina((actual + 1) % paginas.length, true);
-        }, paginas[idx].tiempo);
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining >= 0) {
+          countdownEl.textContent = `Siguiente en: ${remaining} s`;
+        }
+      }, 1000);
+    }
+
+    function scheduleNext() {
+      if (durations[index]) {
+        timeoutId = setTimeout(nextPage, durations[index]);
       }
     }
 
-    // Botón Home
-    document.getElementById('homeArrow').onclick = function() {
-      if (timer) clearTimeout(timer);
-      document.getElementById('main-frame').classList.add('oculto');
-      document.getElementById('inicioPanel').classList.remove('oculto');
-      document.getElementById('topRightBtns').classList.add('oculto');
-      automatico = false;
-    };
+    function nextPage() {
+      index = (index + 1) % pages.length;
 
-    // Botón Siguiente
-    document.getElementById('switchArrow').onclick = function() {
-      let next = (actual + 1) % paginas.length;
-      mostrarPagina(next, automatico);
-    };
+      // ✅ Cuando vuelve a la primera página => refresca toda la página
+      if (index === 0) {
+        location.reload();
+        return;
+      }
+
+      showPage(index);
+      scheduleNext();
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.data === 'slideshow_finished' && pages[index] === 'actual.html') {
+        clearTimeout(timeoutId);
+        nextPage();
+      }
+    });
+
+    showPage(index);
+    scheduleNext();
   </script>
 </body>
 </html>
