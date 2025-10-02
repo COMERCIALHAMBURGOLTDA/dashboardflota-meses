@@ -280,8 +280,8 @@
       function categoriaPorDiff(diffDias) {
         if (diffDias < 0) return 'vencido';            // Negro fijo (sin parpadeo)
         if (diffDias >= 1 && diffDias <= 14) return 'morado';     // Morado (parpadeo)
-        if (diffDias >= 15 && diffDias <= 45) return 'rojo';      // Rojo (parpadeo)
-        if (diffDias >= 46 && diffDias <= 60) return 'amarillo';  // Amarillo (parpadeo)
+        if (diffDias >= 15 && diffDias <= 30) return 'rojo';      // Rojo (parpadeo)
+        if (diffDias >= 31 && diffDias <= 60) return 'amarillo';  // Amarillo (parpadeo)
         return 'none';                                             // Sin color
       }
       function clasePorCategoria(cat) {
