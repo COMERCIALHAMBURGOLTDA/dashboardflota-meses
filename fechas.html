@@ -7,9 +7,7 @@
   <meta http-equiv="refresh" content="300">
   <style>
     /* Forzar impresión en horizontal */
-    @page {
-      size: landscape;
-    }
+    @page { size: landscape; }
 
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -24,12 +22,8 @@
       font-size: 1.8rem;
       color: #005a9e;
     }
-    /* Contenedor que permite scroll horizontal cuando la pantalla sea muy estrecha */
-    #tablaVencimientos {
-      width: 100%;
-      overflow-x: auto;
-      margin-bottom: 20px;
-    }
+    /* Contenedor con scroll horizontal en pantallas angostas */
+    #tablaVencimientos { width: 100%; overflow-x: auto; margin-bottom: 20px; }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -46,63 +40,51 @@
       word-break: break-word;
       border-bottom: 1px solid #ccc;
     }
-    /* Alinear UBICACIÓN (columna 2) y DESCRIPCION (columna 4) a la izquierda */
-    td:nth-child(2),
-    td:nth-child(4) {
-      text-align: left;
-      padding-left: 12px;
-    }
-    /* Estilo para la columna de numeración */
-    th:nth-child(1),
-    td:nth-child(1) {
-      width: 40px;
-    }
-    /* Zebra striping con mayor contraste */
-    tr:nth-child(odd) td {
-      background-color: #ffffff;
-    }
-    tr:nth-child(even) td {
-      background-color: #e0e8f0;
-    }
-    tr:hover td {
-      background-color: #b3d4fc;
-      cursor: default;
-    }
-    tr.total-row td {
-      background-color: #cccccc;
-      font-weight: bold;
-    }
-    /* Animaciones para parpadeo con colores más fuertes y duración 1.5s */
+    /* Alinear UBICACIÓN (col 2) y DESCRIPCION (col 4) a la izquierda */
+    td:nth-child(2), td:nth-child(4) { text-align: left; padding-left: 12px; }
+    /* Numeración */
+    th:nth-child(1), td:nth-child(1) { width: 40px; }
+
+    /* Zebra striping */
+    tr:nth-child(odd) td { background-color: #ffffff; }
+    tr:nth-child(even) td { background-color: #e0e8f0; }
+    tr:hover td { background-color: #b3d4fc; cursor: default; }
+
+    /* Totales */
+    tr.total-row td { background-color: #cccccc; font-weight: bold; }
+    /* Subtotales por sección de color */
+    tr.subtotal-row td { background-color: #dde3ea; font-weight: bold; }
+
+    /* === Animaciones de parpadeo (rojo como patrón) === */
     @keyframes parpadeo-rojo {
       0%   { background-color: rgba(255, 0, 0, 0.7); }
       50%  { background-color: transparent; }
       100% { background-color: rgba(255, 0, 0, 0.7); }
     }
-    .blink-red td {
-      animation: parpadeo-rojo 1.5s infinite;
-    }
+    .blink-red td { animation: parpadeo-rojo 1.5s infinite; }
+
     @keyframes parpadeo-amarillo {
       0%   { background-color: rgba(255, 255, 0, 0.7); }
       50%  { background-color: transparent; }
       100% { background-color: rgba(255, 255, 0, 0.7); }
     }
-    .blink-yellow td {
-      animation: parpadeo-amarillo 1.5s infinite;
-    }
-    /* Animación para parpadeo morado (Productos vencidos) en tono más fuerte y duración 1.5s */
+    .blink-yellow td { animation: parpadeo-amarillo 1.5s infinite; }
+
     @keyframes parpadeo-morado {
       0%   { background-color: rgba(128, 0, 128, 0.7); }
       50%  { background-color: transparent; }
       100% { background-color: rgba(128, 0, 128, 0.7); }
     }
-    .blink-purple td {
-      animation: parpadeo-morado 1.5s infinite;
+    .blink-purple td { animation: parpadeo-morado 1.5s infinite; }
+
+    /* Vencidos: fijo negro con letras blancas (SIN parpadeo) */
+    .vencido td {
+      background-color: #000 !important;
+      color: #fff !important;
     }
-    /* Estilos básicos para los botones */
-    #filtros {
-      text-align: center;
-      margin-bottom: 10px;
-    }
+
+    /* Botones */
+    #filtros { text-align: center; margin-bottom: 10px; }
     #filtros button {
       margin: 0 5px;
       padding: 8px 12px;
@@ -115,27 +97,14 @@
       font-weight: bold;
       transition: background-color 0.2s, color 0.2s;
     }
-    #filtros button:hover {
-      background-color: #e0f0ff;
-    }
-    #filtros button.active {
-      background-color: #005a9e;
-      color: #fff;
-    }
-    /* Ajustes para pantallas muy pequeñas */
+    #filtros button:hover { background-color: #e0f0ff; }
+    #filtros button.active { background-color: #005a9e; color: #fff; }
+
+    /* Responsive */
     @media (max-width: 600px) {
-      th, td {
-        padding: 8px 6px;
-        font-size: 0.85rem;
-      }
-      table {
-        min-width: unset;
-      }
-      #filtros button {
-        margin: 3px 2px;
-        padding: 6px 8px;
-        font-size: 0.8rem;
-      }
+      th, td { padding: 8px 6px; font-size: 0.85rem; }
+      table { min-width: unset; }
+      #filtros button { margin: 3px 2px; padding: 6px 8px; font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -144,17 +113,11 @@
 
   <!-- Botones de filtro -->
   <div id="filtros">
-    <button id="btn30" data-filter="30" onclick="toggleFilter('30')">
-      Vencidos o &lt; 30 días
+    <button id="btnLT90" data-filter="lt90" onclick="toggleFilter('lt90')">
+      Vencidos o &lt; 90 días
     </button>
-    <button id="btn60" data-filter="60" onclick="toggleFilter('60')">
-      31–60 días
-    </button>
-    <button id="btn90" data-filter="90" onclick="toggleFilter('90')">
-      61–90 días
-    </button>
-    <button id="btn91" data-filter="91" onclick="toggleFilter('91')">
-      &gt; 90 días
+    <button id="btnGT90" data-filter="gt90" onclick="toggleFilter('gt90')">
+      Superior a 90 días
     </button>
     <button id="btnAll" data-filter="all" onclick="toggleFilter('all')">
       TODO STOCK
@@ -184,8 +147,7 @@
     }
 
     /**
-     * PARSEAR CADA LÍNEA DE CSV respetando comillas dobles
-     * y comas internas.
+     * PARSEAR CADA LÍNEA DE CSV respetando comillas dobles y comas internas.
      */
     function parseCSVLine(line) {
       const result = [];
@@ -222,39 +184,28 @@
     // Guardaremos todas las filas válidas obtenidas del CSV
     let datosValidos = [];
 
-    // currentFilter controlará qué renglones se muestran:
-    // '30'  → vencidos o a vencer en menos de 30 días (diffDias < 30)
-    // '60'  → a vencer entre 31 y 60 días (diffDias ≥ 31 && ≤ 60)
-    // '90'  → a vencer entre 61 y 90 días (diffDias ≥ 61 && ≤ 90)
-    // '91'  → a vencer en más de 90 días (diffDias > 90)
-    // 'all' → mostrar todo el stock sin filtrar
-    let currentFilter = '30'; // por defecto: < 30 días
+    // currentFilter controla lo que se muestra:
+    // 'lt90' → vencidos o a vencer en < 90 días (diffDias < 90)
+    // 'gt90' → a vencer en > 90 días (diffDias > 90)
+    // 'all'  → todo el stock sin filtrar
+    let currentFilter = 'lt90'; // default
 
-    // Cambia o quita el filtro: si se hace clic en el mismo filtro activo, vuelve a 'all'
+    // Cambiar/alternar filtro
     function toggleFilter(filterValue) {
-      if (currentFilter === filterValue) {
-        currentFilter = 'all';
-      } else {
-        currentFilter = filterValue;
-      }
+      currentFilter = (currentFilter === filterValue) ? 'all' : filterValue;
       actualizarBotones();
       dibujarTablaVencimientos();
     }
 
-    // Actualiza clases "active" en botones según currentFilter
+    // Actualizar clase "active" en los botones
     function actualizarBotones() {
       const botones = document.querySelectorAll('#filtros button');
       botones.forEach(btn => {
         const valor = btn.getAttribute('data-filter');
-        if (valor === currentFilter) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
+        btn.classList.toggle('active', valor === currentFilter);
       });
     }
 
-    // --------------------------------------------------------
     // Fetch + parse del CSV
     function fetchYParsearCSV() {
       document.getElementById("tablaVencimientos").innerHTML =
@@ -288,9 +239,7 @@
                 let mes = parseInt(partes[1], 10) - 1;
                 let anioRaw = partes[2];
                 let anioNum = parseInt(anioRaw, 10);
-                if (anioRaw.length <= 2) {
-                  anioNum += 2000;
-                }
+                if (anioRaw.length <= 2) { anioNum += 2000; }
                 fechaObj = new Date(anioNum, mes, dia);
               } else {
                 fechaObj = new Date(fechaRaw);
@@ -317,8 +266,7 @@
         });
     }
 
-    // --------------------------------------------------------
-    // Dibujar la tabla filtrada según currentFilter
+    // Dibujar la tabla (con subtotales por color y parpadeos)
     function dibujarTablaVencimientos() {
       if (!Array.isArray(datosValidos) || datosValidos.length === 0) {
         document.getElementById("tablaVencimientos").innerHTML =
@@ -327,40 +275,62 @@
       }
 
       const hoy = new Date();
+
+      // Categorizar por diferencia de días
+      function categoriaPorDiff(diffDias) {
+        if (diffDias < 0) return 'vencido';            // Negro fijo (sin parpadeo)
+        if (diffDias >= 1 && diffDias <= 14) return 'morado';     // Morado (parpadeo)
+        if (diffDias >= 15 && diffDias <= 45) return 'rojo';      // Rojo (parpadeo)
+        if (diffDias >= 46 && diffDias <= 60) return 'amarillo';  // Amarillo (parpadeo)
+        return 'none';                                             // Sin color
+      }
+      function clasePorCategoria(cat) {
+        return cat === 'vencido' ? 'vencido'
+             : cat === 'morado' ? 'blink-purple'
+             : cat === 'rojo' ? 'blink-red'
+             : cat === 'amarillo' ? 'blink-yellow'
+             : '';
+      }
+      function etiquetaCat(cat) {
+        return cat === 'vencido' ? 'Vencidos'
+             : cat === 'morado' ? '< 15 días'
+             : cat === 'rojo' ? '15–45 días'
+             : cat === 'amarillo' ? '46–60 días'
+             : '';
+      }
+
+      // Filtrar por rango seleccionado
       const itemsFiltrados = datosValidos
         .filter(r => {
           const diffDias = Math.floor((r._FECHA - hoy) / (1000 * 60 * 60 * 24));
-          if (currentFilter === 'all') {
-            return true;
-          } else if (currentFilter === '30') {
-            return diffDias < 30;
-          } else if (currentFilter === '60') {
-            return diffDias >= 31 && diffDias <= 60;
-          } else if (currentFilter === '90') {
-            return diffDias >= 61 && diffDias <= 90;
-          } else if (currentFilter === '91') {
-            return diffDias > 90;
-          }
+          if (currentFilter === 'all') return true;
+          if (currentFilter === 'lt90') return diffDias < 90;   // incluye vencidos
+          if (currentFilter === 'gt90') return diffDias > 90;
           return false;
         })
         .sort((a, b) => a._FECHA - b._FECHA);
 
       let sumMonto = 0;
+
+      // Para subtotales por sección
+      let catActual = null;
+      let subtotalCat = 0;
+
       let html = `<table>
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>UBICACIÓN</th>
-                        <th>CÓDIGO VENTA</th>
-                        <th>DESCRIPCION</th>
-                        <th>FECHA VENCIMIENTO</th>
-                        <th>DÍAS FALTANTES</th>
-                        <th>UNIDADES</th>
-                        <th>BULTOS</th>
-                        <th>MONTO</th>
-                      </tr>
-                    </thead>
-                    <tbody>`;
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>UBICACIÓN</th>
+            <th>CÓDIGO VENTA</th>
+            <th>DESCRIPCION</th>
+            <th>FECHA VENCIMIENTO</th>
+            <th>DÍAS FALTANTES</th>
+            <th>UNIDADES</th>
+            <th>BULTOS</th>
+            <th>MONTO</th>
+          </tr>
+        </thead>
+        <tbody>`;
 
       if (itemsFiltrados.length === 0) {
         html += `<tr><td colspan="9">No hay productos para el filtro seleccionado.</td></tr>`;
@@ -371,11 +341,9 @@
           const ubic = `${r["BODEGA"]}-${r["NIVEL"]}-${r["PASILLO"]}-${r["RACK"]}`;
           const montoTrunc = Math.trunc(r["TOTAL $"]);
           const unidadesMostrar = r["UNIDADES"] ? parseInt(r["UNIDADES"], 10) : 0;
-          const nivelUpper = r["NIVEL"].toUpperCase();
+          const nivelUpper = r["NIVEL"] ? r["NIVEL"].toUpperCase() : "";
           const fuerzaCeroBultos = nivelUpper.includes("PICKEO") || nivelUpper.includes("CHICLES");
-          const bultosMostrar = fuerzaCeroBultos
-            ? 0
-            : (r["BULTOS"] ? parseInt(r["BULTOS"], 10) : 0);
+          const bultosMostrar = fuerzaCeroBultos ? 0 : (r["BULTOS"] ? parseInt(r["BULTOS"], 10) : 0);
           sumMonto += montoTrunc;
 
           const dd = String(d.getDate()).padStart(2, "0");
@@ -383,45 +351,58 @@
           const yyyy = d.getFullYear();
           const fechaFmt = `${dd}/${mm}/${yyyy}`;
 
-          let displayDias;
-          let claseFila = "";
+          const cat = categoriaPorDiff(diffDias);
+          const claseFila = clasePorCategoria(cat);
 
-          if (diffDias < 0) {
-            displayDias = "PRODUCTO VENCIDO";
-            claseFila = "blink-purple";
-          } else {
-            displayDias = diffDias;
-            if (diffDias >= 1 && diffDias <= 15) {
-              claseFila = "blink-red";
-            } else if (diffDias >= 16 && diffDias <= 30) {
-              claseFila = "blink-yellow";
+          // Si cambia la categoría, imprime el subtotal de la anterior (si tenía color)
+          if (catActual !== null && cat !== catActual) {
+            if (catActual !== 'none') {
+              html += `<tr class="subtotal-row">
+                        <td colspan="8" style="text-align:right">Subtotal ${etiquetaCat(catActual)}</td>
+                        <td><strong>${subtotalCat.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</strong></td>
+                      </tr>`;
             }
+            subtotalCat = 0;
           }
+          catActual = cat;
+
+          // Acumula subtotal solo si es categoría con color
+          if (cat !== 'none') subtotalCat += montoTrunc;
+
+          const displayDias = diffDias < 0 ? "PRODUCTO VENCIDO" : diffDias;
 
           html += `<tr class="${claseFila}">
-                     <td>${index + 1}</td>
-                     <td>${ubic}</td>
-                     <td>${r["CODIGO VENTA"] || ""}</td>
-                     <td>${r["DESCRIPCION"] || ""}</td>
-                     <td>${fechaFmt}</td>
-                     <td>${displayDias}</td>
-                     <td>${unidadesMostrar}</td>
-                     <td>${bultosMostrar}</td>
-                     <td>${montoTrunc.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</td>
-                   </tr>`;
+            <td>${index + 1}</td>
+            <td>${ubic}</td>
+            <td>${r["CODIGO VENTA"] || ""}</td>
+            <td>${r["DESCRIPCION"] || ""}</td>
+            <td>${fechaFmt}</td>
+            <td>${displayDias}</td>
+            <td>${unidadesMostrar}</td>
+            <td>${bultosMostrar}</td>
+            <td>${montoTrunc.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</td>
+          </tr>`;
         });
 
+        // Subtotal final de la última categoría (si corresponde)
+        if (catActual && catActual !== 'none') {
+          html += `<tr class="subtotal-row">
+                    <td colspan="8" style="text-align:right">Subtotal ${etiquetaCat(catActual)}</td>
+                    <td><strong>${subtotalCat.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</strong></td>
+                  </tr>`;
+        }
+
+        // Total general
         html += `<tr class="total-row">
-                   <td colspan="8"></td>
-                   <td><strong>${sumMonto.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</strong></td>
-                 </tr>`;
+                  <td colspan="8"></td>
+                  <td><strong>${sumMonto.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</strong></td>
+                </tr>`;
       }
 
       html += `</tbody></table>`;
       document.getElementById("tablaVencimientos").innerHTML = html;
     }
 
-    // --------------------------------------------------------
     // Al cargar la página:
     window.addEventListener("DOMContentLoaded", () => {
       solicitarWakeLock();
